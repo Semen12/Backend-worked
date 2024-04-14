@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->name('verification.send'); 
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']) 
-                ->name('logout');
+                ->name('logout.sanctum');
                 
     Route::patch('/user/update-profile',[ProfileController::class,'update'])
                 ->name('profile.update');
