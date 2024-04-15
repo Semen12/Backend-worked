@@ -12,10 +12,10 @@ use App\Http\Controllers\ProfileController;
 
 Route::middleware(['guest'])->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store'])
-                ->name('register');
+                ->name('register.sanctum');
  
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])
-                ->name('login'); 
+  /*   Route::post('login', [AuthenticatedSessionController::class, 'store'])
+                ->name('login.sanctum'); */ // вместо него используется роут fortify для входа в систему с применением двухфакторной аутентификации 
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');
