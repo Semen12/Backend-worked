@@ -115,7 +115,7 @@ return [
     */
 
     'limiters' => [
-        'login' => 'login',
+       // 'login' => 'login', // отключение на вход лимита по времени
         'two-factor' => 'two-factor',
     ],
 
