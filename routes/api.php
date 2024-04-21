@@ -9,7 +9,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->name('verification.send');  
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']) 
-                ->name('logout.sanctum');
+                ->name('logout.sanctum'); 
                 
     Route::patch('/user/update-profile',[ProfileController::class,'update'])
                 ->name('profile.update');

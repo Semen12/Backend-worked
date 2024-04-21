@@ -14,8 +14,8 @@ Route::middleware(['guest'])->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store'])
                 ->name('register.sanctum');
  
-     Route::post('api/login', [AuthenticatedSessionController::class, 'store'])
-                ->name('login.sanctum');  // вместо него используется роут fortify для входа в систему с применением двухфакторной аутентификации 
+     /* Route::post('api/login', [AuthenticatedSessionController::class, 'store'])
+                ->name('login.sanctum'); */  // вместо него используется роут fortify для входа в систему с применением двухфакторной аутентификации 
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');
