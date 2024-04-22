@@ -21,8 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 ->middleware('throttle:6,1') 
                 ->name('verification.send');  
 
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']) 
-                ->name('logout.sanctum'); 
+   /*  Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']) 
+                ->name('logout.sanctum');  */ // вход и выход с помощью  fortify
                 
     Route::patch('/user/update-profile',[ProfileController::class,'update'])
                 ->name('profile.update');
