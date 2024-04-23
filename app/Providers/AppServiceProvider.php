@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\CustomLogoutResponseFortify;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        $this->app->bind(LogoutResponseContract::class, CustomLogoutResponseFortify::class);
     }
 
     /**
