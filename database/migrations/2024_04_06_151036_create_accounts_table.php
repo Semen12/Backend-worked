@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->unsignedBigInteger('user_id'); // ID пользователя из таблицы Users
+            $table->string('account_source_type'); // Источник учетной записи (URL, app, etc.)
+            $table->string('username'); // Логин
+            $table->string('password'); // Пароль
+            $table->text('comment')->nullable(); // Комментарий
+            $table->timestamps(); // Дата создания и обновления
+
+            // Внешний ключ для связи с таблицей Users
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
