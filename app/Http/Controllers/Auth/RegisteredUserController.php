@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+
 use \Symfony\Component\HttpFoundation\Response;
 
 class RegisteredUserController extends Controller
@@ -28,12 +29,17 @@ class RegisteredUserController extends Controller
             // почта обязательна для заполнения, маленькие буквы строка, максимальная длина 255, уникальная
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             //пароль обязателен для заполнения, повторить пароль обязателен для заполнения
-        ]);
+            // валидация мастер пароля
+            'master_password'=>['required','confirmed','min:6','different:password'],
+        ] ,[
+            'master_password.different' => 'Мастер пароль должен отличаться от пароля для входа в аккаунт',
+        ] );
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'master_password' => Hash::make($request->master_password),
         ]);
 
         event(new Registered($user)); // событие регистрации пользователя для использования в системе
