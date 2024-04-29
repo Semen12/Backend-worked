@@ -29,11 +29,7 @@ class RegisteredUserController extends Controller
             // почта обязательна для заполнения, маленькие буквы строка, максимальная длина 255, уникальная
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             //пароль обязателен для заполнения, повторить пароль обязателен для заполнения
-            // валидация мастер пароля
-            'master_password'=>['required','confirmed','min:6','different:password'],
-        ] ,[
-            'master_password.different' => 'Мастер пароль должен отличаться от пароля для входа в аккаунт',
-        ] );
+        ]);
 
         $user = User::create([
             'name' => $request->name,
@@ -42,11 +38,10 @@ class RegisteredUserController extends Controller
             'master_password' => Hash::make($request->master_password),
         ]);
 
+        Auth::login($user); // автоматическая утентификация пользователя при регистрации
         event(new Registered($user)); // событие регистрации пользователя для использования в системе
 
-        Auth::login($user); // автоматическая утентификация пользователя при регистрации
-       // $token = $user->createToken('api-front-token')->has;
-        return response()->json(
+       return response()->json(
             [
                 'message' => 'User registered successfully',
                 'user' => $user,
