@@ -11,11 +11,12 @@ use App\Http\Controllers\Auth\PasswordResetLinkController as PasswordResetLinkCo
 use App\Http\Controllers\ProfileController;
 
 Route::middleware(['guest'])->group(function () {
+    
     Route::post('register', [RegisteredUserController::class, 'store'])
                 ->name('register.sanctum');
  
-     /* Route::post('api/login', [AuthenticatedSessionController::class, 'store'])
-                ->name('login.sanctum'); */  // вместо него используется роут fortify для входа в систему с применением двухфакторной аутентификации 
+     /* Route::post('login', [AuthenticatedSessionController::class, 'store'])
+                ->name('login.sanctum'); */  // используется вход fortify
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');

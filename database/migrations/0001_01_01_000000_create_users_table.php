@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('master_password'); // Добавляем поле master_password
+            $table->string('master_password')->nullable(); // Добавляем поле master_password
             $table->rememberToken();
             $table->timestamps();
         });

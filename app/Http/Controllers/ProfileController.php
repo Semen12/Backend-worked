@@ -77,7 +77,7 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(["message`" => "$name, Ваш аккаунт успешно удален"], 200);
+        return response()->json(["message`" => "$name, your account has been deleted"], 200);
          
        
     }

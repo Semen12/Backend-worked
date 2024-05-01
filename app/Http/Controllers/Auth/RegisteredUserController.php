@@ -35,7 +35,6 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'master_password' => Hash::make($request->master_password),
         ]);
 
         Auth::login($user); // автоматическая утентификация пользователя при регистрации
