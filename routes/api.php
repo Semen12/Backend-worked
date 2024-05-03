@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    
+
     Route::patch('/user/update-profile',[ProfileController::class,'update'])
                 ->name('profile.update');
 
@@ -22,15 +22,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::delete('/user/destroy', [ProfileController::class, 'destroy'])
                 ->name('profile.destroy');
-  
-    Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class,'__invoke'])
-                ->middleware(['signed', 'throttle:60,1'])
+
+   Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+                ->middleware('throttle:6,1') 
+                ->name('verification.send'); 
+                 //ограничение по времени 6 попыток в минуту ( по умолчанию)
+    Route::get('/email-verify', VerifyEmailController::class)
+                ->middleware(['signed:relative', 'throttle:6,1'])  // добавлен защитник: подписанный адрес с относительной ссылкой (т.е. без домена)
                 ->name('verification.verify'); 
 
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-                ->middleware('throttle:60,1') 
-                ->name('verification.send');    
-                       
    /*    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']) 
                 ->name('logout.sanctum'); */   // выход с помощью fortify */
     

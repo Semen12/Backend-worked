@@ -4,28 +4,26 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class VerifyEmailController extends Controller
 {
     /**
      * Mark the authenticated user's email address as verified.
      */
-    public function __invoke(EmailVerificationRequest $request): RedirectResponse
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(
-                config('app.frontend_url').'/dashboard?verified=1'
-            );
-        }
-
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
-
-        return redirect()->intended(
-            config('app.frontend_url').'/dashboard?verified=1'
-        );
+    public function __invoke(Request $request): JsonResponse // изменён тип запроса, не из формы (в виде EmailRequest) а через интернет-запрос (Request)
+{
+    // добавлены ответы в виде кодов и собщениями
+    if ($request->user()->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email already verified'], 200);
     }
+
+    if ($request->user()->markEmailAsVerified()) {
+        event(new Verified($request->user())); // необязательное событие
+        return response()->json(['message' => 'Email verified successfully'], 200);
+    }
+
+    return response()->json(['message' => 'Email verification failed'], 500);
+}
 }
