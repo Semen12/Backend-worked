@@ -18,11 +18,12 @@ Route::middleware(['guest'])->group(function () {
      /* Route::post('login', [AuthenticatedSessionController::class, 'store'])
                 ->name('login.sanctum'); */  // используется вход fortify
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    Route::post('password-forgot', [PasswordResetLinkController::class, 'store'])
+                ->middleware('throttle:60,1') // 60 раз в минуту
                 ->name('password.email');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-                ->name('password.store');
+    Route::post('password-reset', [NewPasswordController::class, 'store'])
+                ->name('password.reset');
 
     
 });

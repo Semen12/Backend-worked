@@ -24,11 +24,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 ->name('profile.destroy');
 
    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-                ->middleware('throttle:6,1') 
+                ->middleware('throttle:60,1') 
                 ->name('verification.send'); 
-                 //ограничение по времени 6 попыток в минуту ( по умолчанию)
+                 //ограничение по времени 60 попыток в минуту ( по умолчанию)
     Route::get('/email-verify', VerifyEmailController::class)
-                ->middleware(['signed:relative', 'throttle:6,1'])  // добавлен защитник: подписанный адрес с относительной ссылкой (т.е. без домена)
+                ->middleware(['signed:relative', 'throttle:60,1'])  // добавлен защитник: подписанный адрес с относительной ссылкой (т.е. без домена)
                 ->name('verification.verify'); 
 
    /*    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']) 
