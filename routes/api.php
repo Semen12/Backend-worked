@@ -14,14 +14,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
-    Route::patch('/user/update-profile',[ProfileController::class,'update'])
-                ->name('profile.update');
+    Route::patch('/user/update-name',[ProfileController::class,'updateName'])
+                ->name('profile.name');
 
-    Route::put('/user/password-update', [PasswordController::class, 'update'])->name('password.update');
+    Route::patch('/user/password-update', [PasswordController::class, 'update'])->name('password.update');
          
     
     Route::delete('/user/destroy', [ProfileController::class, 'destroy'])
-                ->name('profile.destroy');
+                ->name('profile.delete');
 
    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
                 ->middleware('throttle:60,1') 

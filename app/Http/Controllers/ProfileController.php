@@ -39,7 +39,19 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request) 
+    public function updateName(Request $request) {
+        $user = $request->user();
+
+        $validatedData = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+    
+        $user->name = $validatedData['name'];
+        $user->save();
+    
+        return response()->json(['message' => 'Имя пользователя успешно обновлено', 'user' => $user], 200);
+    }
+     /* public function update(Request $request) 
     {
       
        $validData =  $request->validate([
@@ -56,7 +68,7 @@ class ProfileController extends Controller
 
         return response()->json(['message' => 'Даныне профиля успешно обновлены', 'user' => $request -> user()], 200);
 
-    }
+    } */
 
     /**
      * Remove the specified resource from storage.
