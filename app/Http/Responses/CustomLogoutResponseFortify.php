@@ -13,9 +13,9 @@ class CustomLogoutResponseFortify implements LogoutResponseContract
 
       public function toResponse($request)
     {
-        
+
         if ($request->wantsJson()) {
             return new JsonResponse(['message' => 'You have been logged out.'], 200);
-        } 
+        }
     }
 }

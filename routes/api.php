@@ -16,6 +16,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::patch('/user/update-name',[ProfileController::class,'updateName'])
                 ->name('profile.name');
+    Route::patch('/user/update-email-unverified',[ProfileController::class,'updateEmailUnverified'])
+                ->name('profile.email.unverified');
 
     Route::patch('/user/password-update', [PasswordController::class, 'update'])->name('password.update');
          

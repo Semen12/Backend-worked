@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use \Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use \Symfony\Component\HttpFoundation\Response;
 
 
 class ProfileController extends Controller
@@ -17,7 +17,6 @@ class ProfileController extends Controller
      */
     public function index()
     {
-     
     }
 
     /**
@@ -39,21 +38,40 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateName(Request $request) {
+    public function updateName(Request $request): JsonResponse
+    {
         $user = $request->user();
 
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
         ]);
-    
+
         $user->name = $validatedData['name'];
         $user->save();
-    
+
         return response()->json(['message' => 'Имя пользователя успешно обновлено', 'user' => $user], 200);
     }
-     /* public function update(Request $request) 
+    public function updateEmailUnverified(Request $request): JsonResponse
     {
-      
+
+        $validatedData = $request->validate([
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($request->user()->id)],
+        ]);
+        $user = $request->user();
+        if (!$user->hasVerifiedEmail()) {
+            $user->email = $validatedData['email'];
+            $user->save();
+            return response()->json(['message' => 'Email пользователя успешно обновлен', 'user' => $user], 200);
+        } else {
+            return response()->json(['message' => 'Email пользователя уже подтвержден. Изменение почты данным способом невозможно.', 'user' => $user], 200);
+        }
+
+    }
+
+
+    /* public function update(Request $request)
+    {
+
        $validData =  $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($request->user()->id)],
@@ -90,7 +108,5 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json(["message`" => "$name, your account has been deleted"], 200);
-         
-       
     }
 }

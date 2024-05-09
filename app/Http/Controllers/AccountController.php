@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Http\Requests\StoreAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
-
+use \Symfony\Component\HttpFoundation\Response;
 class AccountController extends Controller
 {
     /**
