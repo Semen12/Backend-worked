@@ -3,11 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\VerificationСode;
+use App\Notifications\EmailVerificationCode;
+use App\Notifications\NewEmailVerificationCode;
+use App\Notifications\OldEmailVerificationCode;
+use DragonCode\Support\Facades\Helpers\Str;
 use Illuminate\Http\JsonResponse;
 use \Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use \Symfony\Component\HttpFoundation\Response;
+
 
 
 class ProfileController extends Controller
@@ -51,6 +60,7 @@ class ProfileController extends Controller
 
         return response()->json(['message' => 'Имя пользователя успешно обновлено', 'user' => $user], 200);
     }
+
     public function updateEmailUnverified(Request $request): JsonResponse
     {
 
@@ -68,6 +78,38 @@ class ProfileController extends Controller
 
     }
 
+    public function sendCodeEmails(Request $request): JsonResponse
+    {
+        $validData = $request->validate([
+            'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class), 'not_in:' . $request->user()->email]
+        ]);
+        $user = $request->user();
+        VerificationСode::where('user_id', $user->id)->update(['status' => 'invalid']);
+
+        $CodeOldEmail =Str::random(7);
+        $CodeNewEmail = Str::random(7);
+
+        $email_old = VerificationСode::create([
+            'user_id' => $user->id,
+            'type_email' => 'old_email',
+            'verification_value' => $user->email,
+            'code' => Hash::make($CodeOldEmail),
+            'expired_at' => now()->addMinutes(5)
+        ]);
+        $email_new = VerificationСode::create([
+            'user_id' => $user->id,
+            'type_email' => 'new_email',
+            'verification_value' => $validData['new_email'],
+            'code' => Hash::make($CodeNewEmail),
+            'expired_at' => now()->addMinutes(5)
+        ]);
+
+        $user->notify(new OldEmailVerificationCode($CodeOldEmail));
+        Notification::route('mail', $validData['new_email'])->notify(new NewEmailVerificationCode($CodeNewEmail));
+
+
+        return response()->json(['message' => 'Коды подтверждения отправлены.'],200);
+    }
 
     /* public function update(Request $request)
     {
@@ -110,3 +152,4 @@ class ProfileController extends Controller
         return response()->json(["message`" => "$name, your account has been deleted"], 200);
     }
 }
+

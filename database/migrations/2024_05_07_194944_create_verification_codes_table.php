@@ -15,17 +15,19 @@ return new class extends Migration
         Schema::create('verification_codes', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-             $table->string('type_email');
+            $table->string('type_email');
            // $table->string('model_type');
-            $table->string('code');
             $table->string('verification_value');
+            $table->string('code');
             $table->string('status')->default('pending');
             $table->timestamp('verified_at')->nullable();
-            $table->timestamp('expired_at')->nullable();
+            $table->timestamps();
+            $table->timestamp('expired_at');
             
-
+            
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            });
+            
+        });
     }
 
     /**
