@@ -9,12 +9,17 @@ use Illuminate\Notifications\Notifiable;
 class VerificationСode extends Model
 {
     use HasFactory;
+
+
     protected $fillable = [
         'user_id',
         'type_email',
         'code',
         'verification_value',
+        'status',
         'expired_at',
+        'verified_at',
+
     ];
 
     protected function casts(): array // добавления атрибутов
@@ -31,9 +36,14 @@ class VerificationСode extends Model
     {
         return $this->belongsTo(User::class); // обратное отношение один к одному
     }
-    // так как название медели написано по типуСameCase, то установить какую талицу использовать
+    // так как название модели написано по типу СameCase, то установить какую талицу использовать
     public function getTable()
     {
         return 'verification_codes';
     }
+    public static function updateExpiredCodesStatus(): void
+    {
+        self::where('expired_at', '<', now())->update(['status' => 'invalid']);
+    }
+
 }

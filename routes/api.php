@@ -24,6 +24,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('verified')
         ->name('profile.sendсode.emails');
 
+    Route::patch('/user/update-email-verified',[ProfileController::class,'updateEmailVerified'])
+                ->middleware('verified')
+                ->name('profile.email.verified');
 
     Route::patch('/user/password-update', [PasswordController::class, 'update'])->name('password.update');
 

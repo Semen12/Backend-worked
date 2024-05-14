@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\VerificationСode;
-use App\Notifications\EmailVerificationCode;
 use App\Notifications\NewEmailVerificationCode;
 use App\Notifications\OldEmailVerificationCode;
 use DragonCode\Support\Facades\Helpers\Str;
@@ -75,18 +74,18 @@ class ProfileController extends Controller
         } else {
             return response()->json(['message' => 'Email пользователя уже подтвержден. Изменение почты данным способом невозможно.', 'user' => $user], 200);
         }
-
     }
 
     public function sendCodeEmails(Request $request): JsonResponse
     {
         $validData = $request->validate([
-            'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class), 'not_in:' . $request->user()->email]
+            'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255',  Rule::unique(User::class, 'email')]
+            //, 'not_in:' . $request->user()->email]
         ]);
         $user = $request->user();
-        VerificationСode::where('user_id', $user->id)->update(['status' => 'invalid']);
+        VerificationСode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
 
-        $CodeOldEmail =Str::random(7);
+        $CodeOldEmail = Str::random(7);
         $CodeNewEmail = Str::random(7);
 
         $email_old = VerificationСode::create([
@@ -108,8 +107,60 @@ class ProfileController extends Controller
         Notification::route('mail', $validData['new_email'])->notify(new NewEmailVerificationCode($CodeNewEmail));
 
 
-        return response()->json(['message' => 'Коды подтверждения отправлены.'],200);
+        return response()->json(['message' => 'Коды подтверждения отправлены.'], 200);
     }
+
+    public function updateEmailVerified(Request $request): JsonResponse
+    {
+        $validData = $request->validate([
+            'code_oldemail' => ['required', 'string'],
+            'code_newemail' => ['required', 'string']
+        ]);
+
+        $user = $request->user();
+
+        // Поиск активных кодов подтверждения
+        $oldEmailVerification = VerificationСode::where('user_id', $user->id)
+            ->where('type_email', 'old_email')
+            ->where('expired_at', '>', now()) // если на сервере  будет запущен механизм автоматической смены статуса,
+            // то можно убрать эту проверку или в целом пересмотреть проверку кодов с детальным выводом
+            ->where('status', 'pending')
+            ->first();
+
+        $newEmailVerification = VerificationСode::where('user_id', $user->id)
+            ->where('type_email', 'new_email')
+            ->where('status', 'pending')
+            ->where('expired_at', '>', now())
+            ->first();
+
+        // Проверка на существование активных кодов
+        if (!$oldEmailVerification || !$newEmailVerification) {
+            return response()->json(['message' => 'Сессия подтверждения истекла или ещё не инициирована'], 422);
+        }
+
+        // Проверка введенных кодов
+        if (
+            Hash::check($validData['code_oldemail'], $oldEmailVerification->code) &&
+            Hash::check($validData['code_newemail'], $newEmailVerification->code)
+        ) {
+            // Обновление email пользователя
+            $user->email = $newEmailVerification->verification_value;
+            $user->save();
+
+            // Пометить коды как использованные
+            $oldEmailVerification->update(['status' => 'activated', 'verified_at' => now()]);
+            $newEmailVerification->update(['status' => 'activated', 'verified_at' => now()]);
+
+            // Пометить email пользователя как подтвержденный
+            if ($request->user()->markEmailAsVerified()) {
+                return response()->json(['message' => 'Почта успешно обновлена.', $oldEmailVerification], 200);
+            }
+        }
+
+        return response()->json(['message' => 'Проверьте правильность введенных кодов'], 422);
+    }
+
+
 
     /* public function update(Request $request)
     {
@@ -152,4 +203,3 @@ class ProfileController extends Controller
         return response()->json(["message`" => "$name, your account has been deleted"], 200);
     }
 }
-

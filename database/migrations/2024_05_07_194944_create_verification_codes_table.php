@@ -20,9 +20,10 @@ return new class extends Migration
             $table->string('verification_value');
             $table->string('code');
             $table->string('status')->default('pending');
+           $table->timestamp('expired_at');
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
-            $table->timestamp('expired_at');
+            
             
             
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
