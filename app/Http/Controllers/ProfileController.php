@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\VerificationСode;
+use App\Models\VerificationCode;
 use App\Notifications\NewEmailVerificationCode;
 use App\Notifications\OldEmailVerificationCode;
 use DragonCode\Support\Facades\Helpers\Str;
@@ -76,26 +76,26 @@ class ProfileController extends Controller
         }
     }
 
-    public function sendCodeEmails(Request $request): JsonResponse
+    /*public function sendCodeEmails(Request $request): JsonResponse
     {
         $validData = $request->validate([
             'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255',  Rule::unique(User::class, 'email')]
             //, 'not_in:' . $request->user()->email]
         ]);
         $user = $request->user();
-        VerificationСode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
+      //  VerificationCode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
 
         $CodeOldEmail = Str::random(7);
         $CodeNewEmail = Str::random(7);
 
-        $email_old = VerificationСode::create([
+        $email_old = VerificationCode::create([
             'user_id' => $user->id,
             'type_email' => 'old_email',
             'verification_value' => $user->email,
             'code' => Hash::make($CodeOldEmail),
             'expired_at' => now()->addMinutes(5)
         ]);
-        $email_new = VerificationСode::create([
+        $email_new = VerificationCode::create([
             'user_id' => $user->id,
             'type_email' => 'new_email',
             'verification_value' => $validData['new_email'],
@@ -109,6 +109,49 @@ class ProfileController extends Controller
 
         return response()->json(['message' => 'Коды подтверждения отправлены.'], 200);
     }
+*/
+    public function sendCodeEmails(Request $request): JsonResponse
+    {
+        $validData = $request->validate([
+            'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')]
+        ]);
+
+        $user = $request->user();
+
+        // Отметить все предыдущие активные коды как недействительные это излишне для updateorcreate
+      //  VerificationCode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
+
+        // Генерация новых кодов
+        $CodeOldEmail = Str::random(7);
+        $CodeNewEmail = Str::random(7);
+
+        // Проверка наличия существующих кодов и создание новых только при их отсутствии
+        $email_old = VerificationCode::updateOrCreate(
+            ['user_id' => $user->id, 'type_email' => 'old_email', 'status' => 'pending'],
+            [
+                'verification_value' => $user->email,
+                'code' => Hash::make($CodeOldEmail),
+                'expired_at' => now()->addMinutes(10),
+                'status' => 'pending'
+            ]
+        );
+
+        $email_new = VerificationCode::updateOrCreate(
+            ['user_id' => $user->id, 'type_email' => 'new_email', 'status' => 'pending'],
+            [
+                'verification_value' => $validData['new_email'],
+                'code' => Hash::make($CodeNewEmail),
+                'expired_at' => now()->addMinutes(10),
+                'status' => 'pending'
+            ]
+        );
+
+        // Отправка уведомлений с кодами подтверждения
+        $user->notify(new OldEmailVerificationCode($CodeOldEmail));
+        Notification::route('mail', $validData['new_email'])->notify(new NewEmailVerificationCode($CodeNewEmail));
+
+        return response()->json(['message' => 'Коды подтверждения отправлены.'], 200);
+    }
 
     public function updateEmailVerified(Request $request): JsonResponse
     {
@@ -118,16 +161,17 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
-
+        // Отметить все предыдущие активные коды как недействительные это излишне для updateorcreate , но возможно здесь пригодиться если вручную
+        //  VerificationCode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
         // Поиск активных кодов подтверждения
-        $oldEmailVerification = VerificationСode::where('user_id', $user->id)
+        $oldEmailVerification = VerificationCode::where('user_id', $user->id)
             ->where('type_email', 'old_email')
             ->where('expired_at', '>', now()) // если на сервере  будет запущен механизм автоматической смены статуса,
             // то можно убрать эту проверку или в целом пересмотреть проверку кодов с детальным выводом
             ->where('status', 'pending')
             ->first();
 
-        $newEmailVerification = VerificationСode::where('user_id', $user->id)
+        $newEmailVerification = VerificationCode::where('user_id', $user->id)
             ->where('type_email', 'new_email')
             ->where('status', 'pending')
             ->where('expired_at', '>', now())

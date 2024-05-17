@@ -36,13 +36,13 @@ class AppServiceProvider extends ServiceProvider
 
 
         ResetPassword::toMailUsing(function (object $notifiable, string $token){
-            $count = config('auth.passwords.expire');
+            $count = config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
             $urlFrontend = config('app.frontend_url')."/password-reset?email={$notifiable->getEmailForPasswordReset()}&token=$token";
             return (new MailMessage)
             ->subject('Уведомление о сбросе пароля')
             ->line('Вы получили это письмо, потому что мы получили запрос на сброс пароля для вашей учетной записи')
             ->action('Сбросить пароль',   $urlFrontend )
-            ->line("Срок действия этой ссылки для сброса пароля истечет через  {$count} минут.")
+            ->line("Срок действия этой ссылки для сброса пароля истечет через {$count} минут.")
             ->line('Если вы не запрашивали сброс пароля, то проигнорируйте это письмо.');
         });
 

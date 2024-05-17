@@ -43,7 +43,8 @@ class VerificationCode extends Model
     }
     public static function updateExpiredCodesStatus(): void
     {
-        self::where('expired_at', '<', now())->update(['status' => 'invalid']);
+        self::where('expired_at', '<', now())->where('status', 'pending')->update(['status' => 'invalid']);
+        self::where('status', 'invalid')->delete(); // удаляем все невалидные коды
     }
 
 }

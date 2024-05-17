@@ -18,7 +18,7 @@ class OldEmailVerificationCode extends Notification
     /**
      * Create a new notification instance.
      */
-  //  protected string $code;
+    protected string $code;
 
     public function __construct(string $code)
     {
@@ -42,16 +42,17 @@ class OldEmailVerificationCode extends Notification
     {
         $Code = str("<b>{$this->code}</b>" );
 
-        $fontend= config('app.frontend_url').'/reset-password/';
-        $url = str('<a href='.$fontend.'>'.'ссылке'.'</a>');
+        $frontend= config('app.frontend_url').'/reset-password/';
+        $url = str('<a href='.$frontend.'>'.'ссылке'.'</a>');
+        $time = 10;
         return (new MailMessage)
                     ->subject('Уведомление о смене адреса электронной почты')
                   ->line(str("Для смены адреса электронной почты на новый, пожалуйста,
             используйте  код: {$Code} для подтверждения владения учетной записью: ")->toHtmlString())
-                    ->line('Код действителен в течение 5 минут.')
+                    ->line('Код действителен в течение'. $time. ' минут.')
                     ->line('Если вы не регистрировались  на нашем сайте, никаких действий не нужно.')
                     ->line(str("Если вы  регистрировались на нашем сайте, но не запращивали смену почты, то перейдите по {$url} ,
-                    чтобы сбросить пароль.")->toHtmlString());
+                    чтобы сбросить пароль от учётной записи.")->toHtmlString());
 
                    // что-то например добавить еслт вы зареганы но получили письмо то сбросить пароль ?
     }

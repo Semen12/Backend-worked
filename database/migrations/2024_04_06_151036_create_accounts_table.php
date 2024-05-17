@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id'); // ID пользователя из таблицы Users
+            $table->unsignedInteger('user_id'); // ID пользователя из таблицы Users
             $table->string('account_source_type'); // Источник учетной записи (URL, app, etc.)
             $table->string('username'); // Логин
             $table->string('password'); // Пароль

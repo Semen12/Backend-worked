@@ -11,23 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-
-        Schema::create('verification_codes', function (Blueprint $table) {
+        Schema::create('master_password_reset_tokens', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id');
-            $table->string('type_email');
-           // $table->string('model_type');
-            $table->string('verification_value');
-            $table->string('code');
-            $table->string('status')->default('pending');
-           $table->timestamp('expired_at');
-            $table->timestamp('verified_at')->nullable();
+            $table->string('token');
+            $table->timestamp('expired_at');
             $table->timestamps();
 
 
-
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
         });
     }
 
@@ -36,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('verification_codes');
+        Schema::dropIfExists('master_password_tokens');
     }
 };

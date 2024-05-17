@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\VerificationСode;
+use App\Models\VerificationCode;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schedule;
 
@@ -28,7 +28,7 @@ class StatusCode extends Command
     public function handle(): void
     {
         //
-            VerificationСode::updateExpiredCodesStatus();
+            VerificationCode::updateExpiredCodesStatus();
             $this->info('Statuses updated successfully');
     }
 

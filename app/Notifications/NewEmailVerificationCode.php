@@ -16,7 +16,7 @@ class NewEmailVerificationCode extends Notification
     /**
      * Create a new notification instance.
      */
-  //  protected string $code;
+    protected string $code;
 
     public function __construct(string $code)
     {
@@ -39,12 +39,13 @@ class NewEmailVerificationCode extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $Code = str("<b>{$this->code}</b>" );
+        $time = 10;
         return (new MailMessage)
                     ->subject('Уведомление о смене адреса электронной почты')
                     ->line(str("Для подтверждения смены адреса электронной почты на текущий, пожалуйста, используйте следующий код
                      подтверждения: {$Code}")->toHtmlString())
                     //->action('Notification Action', url('/'))
-                    ->line('Код действителен в течение 5 минут.')
+                    ->line('Код действителен в течение'. $time.' минут.')
                     ->line('Если вы не запрашивали смену почты, можете просто проигнорировать это письмо.');
 
                    // что-то например добавить еслт вы зареганы но получили письмо то сбросить пароль ?
