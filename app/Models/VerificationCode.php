@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 class VerificationCode extends Model
 {
     use HasFactory;
-
 
     protected $fillable = [
         'user_id',
@@ -31,20 +29,22 @@ class VerificationCode extends Model
 
         ];
     }
+
     // Добавляем отношение к модели User
     public function user()
     {
         return $this->belongsTo(User::class); // обратное отношение один к одному
     }
+
     // так как название модели написано по типу СameCase, то установить какую талицу использовать
     public function getTable()
     {
         return 'verification_codes';
     }
+
     public static function updateExpiredCodesStatus(): void
     {
         self::where('expired_at', '<', now())->where('status', 'pending')->update(['status' => 'invalid']);
         self::where('status', 'invalid')->delete(); // удаляем все невалидные коды
     }
-
 }

@@ -8,15 +8,13 @@ use App\Notifications\NewEmailVerificationCode;
 use App\Notifications\OldEmailVerificationCode;
 use DragonCode\Support\Facades\Helpers\Str;
 use Illuminate\Http\JsonResponse;
-use \Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
-use \Symfony\Component\HttpFoundation\Response;
-
-
+use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController extends Controller
 {
@@ -67,9 +65,10 @@ class ProfileController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($request->user()->id)],
         ]);
         $user = $request->user();
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             $user->email = $validatedData['email'];
             $user->save();
+
             return response()->json(['message' => 'Email пользователя успешно обновлен', 'user' => $user], 200);
         } else {
             return response()->json(['message' => 'Email пользователя уже подтвержден. Изменение почты данным способом невозможно.', 'user' => $user], 200);
@@ -113,13 +112,13 @@ class ProfileController extends Controller
     public function sendCodeEmails(Request $request): JsonResponse
     {
         $validData = $request->validate([
-            'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')]
+            'new_email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
         ]);
 
         $user = $request->user();
 
         // Отметить все предыдущие активные коды как недействительные это излишне для updateorcreate
-      //  VerificationCode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
+        //  VerificationCode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
 
         // Генерация новых кодов
         $CodeOldEmail = Str::random(7);
@@ -132,7 +131,7 @@ class ProfileController extends Controller
                 'verification_value' => $user->email,
                 'code' => Hash::make($CodeOldEmail),
                 'expired_at' => now()->addMinutes(10),
-                'status' => 'pending'
+                'status' => 'pending',
             ]
         );
 
@@ -142,7 +141,7 @@ class ProfileController extends Controller
                 'verification_value' => $validData['new_email'],
                 'code' => Hash::make($CodeNewEmail),
                 'expired_at' => now()->addMinutes(10),
-                'status' => 'pending'
+                'status' => 'pending',
             ]
         );
 
@@ -157,7 +156,7 @@ class ProfileController extends Controller
     {
         $validData = $request->validate([
             'code_oldemail' => ['required', 'string'],
-            'code_newemail' => ['required', 'string']
+            'code_newemail' => ['required', 'string'],
         ]);
 
         $user = $request->user();
@@ -178,7 +177,7 @@ class ProfileController extends Controller
             ->first();
 
         // Проверка на существование активных кодов
-        if (!$oldEmailVerification || !$newEmailVerification) {
+        if (! $oldEmailVerification || ! $newEmailVerification) {
             return response()->json(['message' => 'Сессия подтверждения истекла или ещё не инициирована'], 422);
         }
 
@@ -203,8 +202,6 @@ class ProfileController extends Controller
 
         return response()->json(['message' => 'Проверьте правильность введенных кодов'], 422);
     }
-
-
 
     /* public function update(Request $request)
     {
@@ -244,6 +241,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(["message`" => "$name, your account has been deleted"], 200);
+        return response()->json(['message`' => "$name, your account has been deleted"], 200);
     }
 }

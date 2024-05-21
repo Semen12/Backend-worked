@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 namespace App\Providers;
 
 use Illuminate\Auth\Events\Registered;
@@ -17,14 +17,12 @@ class EventServiceProvider extends ServiceProvider
     // Дополнительный код сервис-провайдера событий...
 } */
 
-
 namespace App\Providers;
 
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
-use App\Listeners\RegisteredUserHandler;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -49,24 +47,25 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
     }
 
-	/**
-	 * The event listener mappings for the application.
-	 * 
-	 * @return array
-	 */
-	public function getListen() {
-		return $this->listen;
-	}
-	
-	/**
-	 * The event listener mappings for the application.
-	 * 
-	 * @param array $listen The event listener mappings for the application.
-	 * @return self
-	 */
-	public function setListen($listen): self {
-		$this->listen = $listen;
-		return $this;
-	}
-}
+    /**
+     * The event listener mappings for the application.
+     *
+     * @return array
+     */
+    public function getListen()
+    {
+        return $this->listen;
+    }
 
+    /**
+     * The event listener mappings for the application.
+     *
+     * @param  array  $listen  The event listener mappings for the application.
+     */
+    public function setListen($listen): self
+    {
+        $this->listen = $listen;
+
+        return $this;
+    }
+}

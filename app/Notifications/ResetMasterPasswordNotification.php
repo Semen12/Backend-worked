@@ -4,10 +4,8 @@ namespace App\Notifications;
 
 use AllowDynamicProperties;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 
@@ -19,6 +17,7 @@ use Illuminate\Support\Facades\URL;
      * Create a new notification instance.
      */
     protected string $token;
+
     public function __construct($token)
     {
         //
@@ -40,12 +39,13 @@ use Illuminate\Support\Facades\URL;
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $frontend= config('app.frontend_url').'/reset-password/';
+        $frontend = config('app.frontend_url').'/reset-password/';
         $url = str('<a href='.$frontend.'>'.'ссылке'.'</a>');
 
-        $urlFrontend = config('app.frontend_url').URL::signedRoute('reset.master.password',['id' => $notifiable->getKey(),
-        'token' => $this->token], Carbon::now()->addMinutes(60), false);
+        $urlFrontend = config('app.frontend_url').URL::signedRoute('reset.master.password', ['id' => $notifiable->getKey(),
+            'token' => $this->token], Carbon::now()->addMinutes(60), false);
         $time = 60;
+
         return (new MailMessage)
             ->subject('Уведомление о сбросе мастер-пароля')
             ->line('Нажмите на кнопку ниже, чтобы перейти к сбросу мастер-пароля.')

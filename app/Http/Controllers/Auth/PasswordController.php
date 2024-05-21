@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-
 class PasswordController extends Controller
 {
     /**
@@ -50,7 +49,6 @@ class PasswordController extends Controller
 
         return response()->json(['message' => 'Пароль обновлен'], 200);
     }
-    
 
     /**
      * Remove the specified resource from storage.

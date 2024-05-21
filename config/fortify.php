@@ -115,8 +115,8 @@ return [
     */
 
     'limiters' => [
-       // 'login' => 'login', // отключение на вход лимита по времени
-       // 'two-factor' => 'two-factor',
+        // 'login' => 'login', // отключение на вход лимита по времени
+        // 'two-factor' => 'two-factor',
     ],
 
     /*
@@ -130,7 +130,7 @@ return [
     |
     */
 
-    'views' =>false,
+    'views' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -144,9 +144,9 @@ return [
     */
 
     'features' => [
-      /*   Features::registration(),
+        /*   Features::registration(),
         Features::resetPasswords(),
-        
+
         Features::updateProfileInformation(),
         Features::updatePasswords(), */
         // Features::emailVerification(),

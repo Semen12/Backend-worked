@@ -16,15 +16,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('user_id');
             $table->string('type_email');
-           // $table->string('model_type');
+            // $table->string('model_type');
             $table->string('verification_value');
             $table->string('code');
             $table->string('status')->default('pending');
-           $table->timestamp('expired_at');
+            $table->timestamp('expired_at');
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
-
-
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 

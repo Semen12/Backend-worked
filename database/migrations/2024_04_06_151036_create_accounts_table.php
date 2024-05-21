@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id'); // ID пользователя из таблицы Users
-            $table->string('account_source_type'); // Источник учетной записи (URL, app, etc.)
-            $table->string('username'); // Логин
-            $table->string('password'); // Пароль
-            $table->text('comment')->nullable(); // Комментарий
+            $table->string('name'); // Название
+            $table->string('type'); // Тип учетной записи например ссылка, приложение и т.д.
+            $table->string('url')->nullable(); // Источник учетной записи (URL)
+            $table->string('login'); // Логин
+            $table->string('password')->nullable(); // Хэш пароля (если указан)
+            $table->text('description')->nullable(); // Комментарий (если указан)
             $table->timestamps(); // Дата создания и обновления
 
             // Внешний ключ для связи с таблицей Users

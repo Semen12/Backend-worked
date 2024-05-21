@@ -15,11 +15,10 @@ return [
     |
     */
 
-
-  /*   'stateful' => explode(',', env(
+    /*   'stateful' => explode(',', env(
         'SANCTUM_STATEFUL_DOMAINS',
         'localhost,localhost:8000,localhost:8080,::1'
-      )), */ 
+      )), */
 
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s%s',
@@ -82,9 +81,10 @@ return [
     */
 
     'middleware' => [
-       'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class, 
+        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
+        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
         'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+
     ],
 
 ];

@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 //use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use \Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): JsonResponse
     {
-        $request->authenticate();  /* проверяет учетные данные пользователя из запроса. Если учетные данные верны, пользователь успешно аутентифицируется в системе. Если учетные данные неверны, 
+        $request->authenticate();  /* проверяет учетные данные пользователя из запроса. Если учетные данные верны, пользователь успешно аутентифицируется в системе. Если учетные данные неверны,
         будет сгенерировано исключение и сгенерируется сообщение об ошибке аутентификации. */
 
         $request->session()->regenerate();
@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
         return response()->json(
             [
                 'message' => 'Successfully logged in',
-                'user' => $request->user()
+                'user' => $request->user(),
             ],
             Response::HTTP_OK,
             $request->filled('errors') ? $request->get('errors') : [],
@@ -36,19 +36,18 @@ class AuthenticatedSessionController extends Controller
         );
     }
 
-
     /**
      * Destroy an authenticated session.
      */
     public function destroy(Request $request): JsonResponse
     {
-        Auth::guard('web')->logout(); /* Эта строка отвечает за выход пользователя из системы. Она использует метод logout() для аутентификационного экземпляра по умолчанию web. 
+        Auth::guard('web')->logout(); /* Эта строка отвечает за выход пользователя из системы. Она использует метод logout() для аутентификационного экземпляра по умолчанию web.
         После выполнения этой строки пользователь больше не будет аутентифицирован в системе. */
 
-        $request->session()->invalidate(); /*  Этот вызов инвалидирует текущую сессию пользователя. Это означает, что сессия пользователя будет помечена как недействительная, 
+        $request->session()->invalidate(); /*  Этот вызов инвалидирует текущую сессию пользователя. Это означает, что сессия пользователя будет помечена как недействительная,
         и после выхода из системы текущая сессия не будет больше действительной. */
 
-        $request->session()->regenerateToken(); //  генерирует новый CSRF-токен (Cross-Site Request Forgery) 
+        $request->session()->regenerateToken(); //  генерирует новый CSRF-токен (Cross-Site Request Forgery)
 
         return response()->json(
             [
@@ -59,7 +58,4 @@ class AuthenticatedSessionController extends Controller
             JSON_UNESCAPED_UNICODE
         );
     }
-
-  
-
 }

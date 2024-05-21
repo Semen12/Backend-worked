@@ -11,8 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-
-use \Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class RegisteredUserController extends Controller
 {
@@ -40,7 +39,7 @@ class RegisteredUserController extends Controller
         Auth::login($user); // автоматическая утентификация пользователя при регистрации
         event(new Registered($user)); // событие регистрации пользователя для использования в системе
 
-       return response()->json(
+        return response()->json(
             [
                 'message' => 'User registered successfully',
                 'user' => $user,

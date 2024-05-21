@@ -8,7 +8,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
-        apiPrefix: '',// здесь можно установить 
+        apiPrefix: '', // здесь можно установить
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'verify.master.password' => App\Http\Middleware\InstalledMasterPassword::class,
+            'master.password.check'=> App\Http\Middleware\CheckMasterPassword::class,
         ]);
 
         //

@@ -28,20 +28,22 @@ class MasterPasswordToken extends Model
 
         ];
     }
+
     // Добавляем отношение к модели User
     public function user()
     {
         return $this->belongsTo(User::class); // обратное отношение один к одному
     }
+
     // так как название модели написано по типу CameCase, то установить какую талицу использовать
     public function getTable()
     {
         return 'master_password_reset_tokens';
     }
 
-//    если будет автоматом запускаться удаление токенов после истечения срока действия
-//    public static function updateExpiredCodesStatus(): void
-//    {
-//        self::where('expired_at', '<', now())->update(['status' => 'invalid']);
-//    }
+    //    если будет автоматом запускаться удаление токенов после истечения срока действия
+    //    public static function updateExpiredCodesStatus(): void
+    //    {
+    //        self::where('expired_at', '<', now())->update(['status' => 'invalid']);
+    //    }
 }

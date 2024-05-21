@@ -16,16 +16,16 @@ class PasswordResetLinkController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    
-   /*   public function create(): Response
-     {
-         return response()->inertia('Auth/ForgotPassword', [
-             'status' => session('status'),
-         ]);
-     } */
+
+    /*   public function create(): Response
+      {
+          return response()->inertia('Auth/ForgotPassword', [
+              'status' => session('status'),
+          ]);
+      } */
     public function store(Request $request): JsonResponse
     {
-        
+
         $request->validate([
             'email' => ['required', 'email'],
         ]);
