@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class MasterPasswordController extends Controller
 {
@@ -38,7 +39,12 @@ class MasterPasswordController extends Controller
         }
 
         $validData = $request->validate([
-            'master_password' => ['required', 'confirmed', 'min:6', 'max:255',
+            'master_password' => ['required', 'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(), 'max:255',
                 function ($attribute, $value, $fail) use ($request) {
                     // Пользовательское  правило для проверки отличия от текущего пароля и мастер-пароля
                     if (Hash::check($value, $request->user()->password)) {
@@ -68,7 +74,12 @@ class MasterPasswordController extends Controller
                     $fail('Текущий мастер-пароль не верен');
                 }
             }],
-            'new_master_password' => ['required', 'confirmed', 'min:6', 'max:255', 'different:master_password',
+            'new_master_password' => ['required', 'confirmed', Password::min(6)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised(),
+                'max:255', 'different:master_password',
                 function ($attribute, $value, $fail) use ($request) {
                     if (Hash::check($value, $request->user()->password)) {
                         $fail('Новый мастер-пароль должен отличаться от пароля учетной записи');
@@ -114,11 +125,15 @@ class MasterPasswordController extends Controller
         }
         $user = $request->user();
         $request->validate([
-            'master_password' => ['required', 'min:6', 'confirmed', function ($attribute, $value, $fail) use ($request) {
-                if (Hash::check($value, $request->user()->password)) {
-                    $fail('Мастер-пароль не должен совпадать с паролем учетной записи');
-                }
-            }],
+            'master_password' => ['required', Password::min(6)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised(), 'confirmed', function ($attribute, $value, $fail) use ($request) {
+                    if (Hash::check($value, $request->user()->password)) {
+                        $fail('Мастер-пароль не должен совпадать с паролем учетной записи');
+                    }
+                }],
         ]);
 
         $resetToken = MasterPasswordToken::where('user_id', $user->id)->first();

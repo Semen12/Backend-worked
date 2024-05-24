@@ -8,6 +8,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +28,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(function () {
+            $rule = Password::min(8);
+
+            return $this->app->isLocal()
+                ? $rule->numbers()->symbols()->mixedCase()->uncompromised()
+                : $rule;
+        });
 
         ResetPassword::toMailUsing(function (object $notifiable, string $token) {
             $count = config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
