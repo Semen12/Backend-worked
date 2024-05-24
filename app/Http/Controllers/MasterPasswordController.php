@@ -48,7 +48,7 @@ class MasterPasswordController extends Controller
             ],
 
         ]);
-        $user->master_password = Hash::make($validData['master_password']);
+        $user->master_password = $validData['master_password'];
         $user->save();
 
         return response()->json(['message' => 'Мастер-пароль успешно установлен'], 201);
@@ -78,7 +78,7 @@ class MasterPasswordController extends Controller
             'new_master_password.different' => 'Новый мастер-пароль должен отличаться от текущего мастер-пароля',
         ]);
 
-        $user->update(['master_password' => Hash::make($validData['new_master_password'])]);
+        $user->update(['master_password' => $validData['new_master_password']]);
 
         return response()->json(['message' => 'Мастер-пароль обновлен'], 200);
 
@@ -95,15 +95,15 @@ class MasterPasswordController extends Controller
         $expiredAt = Carbon::now()->addMinutes(60);
         $resetToken = MasterPasswordToken::updateOrCreate(
             ['user_id' => $user->id],
-            ['token' => Hash::make($token), 'expired_at' => $expiredAt]);
+            ['token' => $token, 'expired_at' => $expiredAt]);
 
         if ($resetToken) {
             $user->notify(new ResetMasterPasswordNotification($token));
 
-            return response()->json(['message' => 'Ссылка для восстановления мастер-парпароля отправлена на почту'], 200);
+            return response()->json(['message' => 'Ссылка для восстановления мастер-пароля отправлена на почту'], 200);
         }
 
-        return response()->json(['message' => 'Ссылка для восстановления мастер-парпароля не отправлена. Что-то пошло не так'], 500);
+        return response()->json(['message' => 'Ссылка для восстановления мастер-пароля не отправлена. Что-то пошло не так'], 500);
 
     }
 
@@ -132,7 +132,7 @@ class MasterPasswordController extends Controller
             return response()->json(['message' => 'Срок действия токена сброса мастер-пароля истек, отправьте письмо для сброса повторно'], 422);
         }
 
-        $user->update(['master_password' => Hash::make($request->master_password)]);
+        $user->update(['master_password' => $request->master_password]);
         $resetToken->delete();
 
         return response()->json(['message' => 'Мастер-пароль успешно изменен'], 200);
@@ -143,7 +143,7 @@ class MasterPasswordController extends Controller
         // позволяет использовать механизмы сессии для установки статуса мастер пароля
     {
         $request->validate([
-            'master_password' => 'required|string|min:6|max:255',
+            'master_password' => 'required|string|min:6|max:255'
         ]);
 
         $user = $request->user();

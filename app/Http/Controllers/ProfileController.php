@@ -129,7 +129,7 @@ class ProfileController extends Controller
             ['user_id' => $user->id, 'type_email' => 'old_email', 'status' => 'pending'],
             [
                 'verification_value' => $user->email,
-                'code' => Hash::make($CodeOldEmail),
+                'code' => $CodeOldEmail,
                 'expired_at' => now()->addMinutes(10),
                 'status' => 'pending',
             ]
@@ -139,7 +139,7 @@ class ProfileController extends Controller
             ['user_id' => $user->id, 'type_email' => 'new_email', 'status' => 'pending'],
             [
                 'verification_value' => $validData['new_email'],
-                'code' => Hash::make($CodeNewEmail),
+                'code' => $CodeNewEmail,
                 'expired_at' => now()->addMinutes(10),
                 'status' => 'pending',
             ]
@@ -155,8 +155,8 @@ class ProfileController extends Controller
     public function updateEmailVerified(Request $request): JsonResponse
     {
         $validData = $request->validate([
-            'code_oldemail' => ['required', 'string'],
-            'code_newemail' => ['required', 'string'],
+            'code_oldemail' => ['required', 'string','max:64'],
+            'code_newemail' => ['required', 'string','max:64'],
         ]);
 
         $user = $request->user();

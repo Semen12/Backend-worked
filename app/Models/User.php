@@ -33,6 +33,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'master_password',
         'remember_token',
+    // добавить для скрытия полей 2FA 'two_factor_recovery_codes',
+        //    'two_factor_secret',
     ];
 
     /**

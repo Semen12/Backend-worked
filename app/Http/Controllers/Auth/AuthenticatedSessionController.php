@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): JsonResponse
-    {
+    { // не требуется вход с помощью fortify !
         $request->authenticate();  /* проверяет учетные данные пользователя из запроса. Если учетные данные верны, пользователь успешно аутентифицируется в системе. Если учетные данные неверны,
         будет сгенерировано исключение и сгенерируется сообщение об ошибке аутентификации. */
 
@@ -51,7 +51,7 @@ class AuthenticatedSessionController extends Controller
 
         return response()->json(
             [
-                'message' => 'Successfully logged out',
+                'message' => 'Вы вышли из системы',
             ],
             Response::HTTP_OK,
             [],

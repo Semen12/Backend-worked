@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
         ]);
 
         Auth::login($user); // автоматическая утентификация пользователя при регистрации
@@ -41,7 +41,7 @@ class RegisteredUserController extends Controller
 
         return response()->json(
             [
-                'message' => 'User registered successfully',
+                'message' => 'Вы успешно зарегистрировались!',
                 'user' => $user,
             ],
             Response::HTTP_CREATED,

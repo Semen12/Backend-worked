@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return response()->json([
+            'user' => $request->user(),
+            // 'two_factor'=>$request->user()->hasEnabledTwoFactorAuthentication(), //метод который проверяет наличие включения 2FA
+        ]);
     });
 
     Route::patch('/user/update-name', [ProfileController::class, 'updateName'])

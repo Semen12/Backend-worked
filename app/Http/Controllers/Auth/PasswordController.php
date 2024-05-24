@@ -44,7 +44,7 @@ class PasswordController extends Controller
         ]);
 
         $request->user()->update([
-            'password' => Hash::make($validated['password']),
+            'password' => $validated['password'],
         ]);
 
         return response()->json(['message' => 'Пароль обновлен'], 200);
