@@ -63,7 +63,7 @@ class AccountController extends Controller
             ->first();
 
         if ($existingAccountByNameAndLogin) {
-            return response()->json(['message' => 'Учетная запись с такими названием и логином уже существует'], 422);
+            return response()->json(['error' => 'Учетная запись с такими названием и логином уже существует'], 422);
         }
 
         // Проверка дублирования учетной записи по login и url, если URL указан
@@ -74,13 +74,13 @@ class AccountController extends Controller
                 ->first();
 
             if ($existingAccountByLoginAndUrl) {
-                return response()->json(['message' => 'Учетная запись с таким логином и url-адресом уже существует'], 422);
+                return response()->json(['error' => 'Учетная запись с таким логином и url-адресом уже существует'], 422);
             }
         }
 
         // Проверка корректности URL для интернет-ресурсов
         if ($type === AccountType::INTERNET_RESOURCE->value && ! $url) {
-            return response()->json(['message' => 'URL обязателен для выбранного типа учетной записи'], 422);
+            return response()->json(['error' => 'URL обязателен для выбранного типа учетной записи'], 422);
         }
 
         $account = Account::create([
@@ -104,7 +104,7 @@ class AccountController extends Controller
         $userId = request()->user()->id;
         $account = Account::select(['id', 'type', 'name', 'url', 'login', 'password', 'description'])->where('user_id', $userId)->find($id);
         if (! $account) {
-            return response()->json(['message' => 'Учетная запись не найдена'], 404);
+            return response()->json(['error' => 'Учетная запись не найдена'], 404);
         }
         // Отключаем скрытие атрибута "password"
         $account->makeVisible('password');
@@ -138,7 +138,7 @@ class AccountController extends Controller
         $userId = $request->user()->id;
         $account = Account::where('user_id', $userId)->find($id);
         if (! $account) {
-            return response()->json(['message' => 'Учетная запись не найдена'], 404);
+            return response()->json(['error' => 'Учетная запись не найдена'], 404);
         }
 
         $type = $validatedData['type'];
@@ -154,11 +154,11 @@ class AccountController extends Controller
             ->first();
 
         if ($existingAccountByNameAndLogin) {
-            return response()->json(['message' => 'Учетная запись с такими названием и логином уже существует'], 422);
+            return response()->json(['error' => 'Учетная запись с такими названием и логином уже существует'], 422);
         }
         // Проверка корректности URL для интернет-ресурсов
         if ($type === AccountType::INTERNET_RESOURCE->value && ! $url) {
-            return response()->json(['message' => 'URL обязателен для выбранного типа учетной записи'], 422);
+            return response()->json(['error' => 'URL обязателен для выбранного типа учетной записи'], 422);
         }
         // Проверка дублирования учетной записи по login и url, если URL указан
         if ($url) {
@@ -169,7 +169,7 @@ class AccountController extends Controller
                 ->first();
 
             if ($existingAccountByLoginAndUrl) {
-                return response()->json(['message' => 'Учетная запись с таким логином и url-адресом уже существует'], 422);
+                return response()->json(['error' => 'Учетная запись с таким логином и url-адресом уже существует'], 422);
             }
         }
 
@@ -194,7 +194,7 @@ class AccountController extends Controller
         $userId = request()->user()->id;
         $account = Account::where('user_id', $userId)->find($id);
         if (! $account) {
-            return response()->json(['message' => 'Учетная запись не найдена'], 404);
+            return response()->json(['error' => 'Учетная запись не найдена'], 404);
         }
         $account->delete();
 

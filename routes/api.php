@@ -80,7 +80,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
     });
-    Route::patch('/user/password-update', [PasswordController::class, 'update'])->name('password.update');
+    Route::patch('/user/password-update', [PasswordController::class, 'update'])
+        ->name('password.update');
 
     Route::delete('/user/destroy', [ProfileController::class, 'destroy'])
         ->name('profile.delete');

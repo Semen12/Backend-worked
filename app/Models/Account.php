@@ -14,8 +14,6 @@ class Account extends Model
         'user_id', 'type', 'url', 'name', 'login', 'password', 'description',
     ];
 
-
-
     protected $hidden = [
         'password',
     ];
@@ -35,27 +33,28 @@ class Account extends Model
         return $this->belongsTo(User::class); // обратное отношение один к одному
     }
 
-    public static function getResponseCode($url): bool
-    {
-        $header = '';
-        $options = [
-            CURLOPT_URL => trim($url),
-            CURLOPT_HEADER => false,
-            CURLOPT_RETURNTRANSFER => true,
-        ];
+    /* public static function getResponseCode($url): bool
+     {
+         $header = '';
+         $options = [
+             CURLOPT_URL => trim($url),
+             CURLOPT_HEADER => false,
+             CURLOPT_RETURNTRANSFER => true,
+         ];
 
-        $ch = curl_init();
-        curl_setopt_array($ch, $options);
-        curl_exec($ch);
-        if (! curl_errno($ch)) {
-            $header = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        }
-        curl_close($ch);
+         $ch = curl_init();
+         curl_setopt_array($ch, $options);
+         curl_exec($ch);
+         if (! curl_errno($ch)) {
+             $header = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+         }
+         curl_close($ch);
 
-        if ($header > 0 && $header < 400) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+         if ($header > 0 && $header < 400) {
+             return true;
+         } else {
+             return false;
+         }
+     }
+    */
 }

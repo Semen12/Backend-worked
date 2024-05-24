@@ -103,14 +103,14 @@ class MasterPasswordController extends Controller
             return response()->json(['message' => 'Ссылка для восстановления мастер-пароля отправлена на почту'], 200);
         }
 
-        return response()->json(['message' => 'Ссылка для восстановления мастер-пароля не отправлена. Что-то пошло не так'], 500);
+        return response()->json(['error' => 'Ссылка для восстановления мастер-пароля не отправлена. Что-то пошло не так'], 500);
 
     }
 
     public function reset(Request $request)
     {
         if ($request->user()->id != $request->id) {
-            return response()->json(['message' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 403);
+            return response()->json(['error' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 403);
         }
         $user = $request->user();
         $request->validate([
@@ -123,13 +123,13 @@ class MasterPasswordController extends Controller
 
         $resetToken = MasterPasswordToken::where('user_id', $user->id)->first();
         if (! $resetToken || ! Hash::check($request->token, $resetToken->token)) {
-            return response()->json(['message' => 'Недействительный токен для сброса мастер-пароля'], 422);
+            return response()->json(['error' => 'Недействительный токен для сброса мастер-пароля'], 422);
         }
         if (Carbon::now()->gt($resetToken->expired_at)) {
             $resetToken->delete();
 
             // Срок действия токена истек
-            return response()->json(['message' => 'Срок действия токена сброса мастер-пароля истек, отправьте письмо для сброса повторно'], 422);
+            return response()->json(['error' => 'Срок действия токена сброса мастер-пароля истек, отправьте письмо для сброса повторно'], 422);
         }
 
         $user->update(['master_password' => $request->master_password]);
@@ -140,10 +140,10 @@ class MasterPasswordController extends Controller
     }
 
     public function setMasterPassword(Request $request) // данная функция
-        // позволяет использовать механизмы сессии для установки статуса мастер пароля
+    // позволяет использовать механизмы сессии для установки статуса мастер пароля
     {
         $request->validate([
-            'master_password' => 'required|string|min:6|max:255'
+            'master_password' => 'required|string|min:6|max:255',
         ]);
 
         $user = $request->user();
@@ -158,7 +158,6 @@ class MasterPasswordController extends Controller
         return response()->json(['error' => 'Недействительный мастер-пароль'], 403);
     }
 
-
     public function checkMasterPassword(Request $request)// Проверка, установлен ли мастер-пароль в сессии и его срок действия
     {
         $isVerified = $request->session()->get('master_password_verified', false);
@@ -168,9 +167,11 @@ class MasterPasswordController extends Controller
             return response()->json(['master_password' => true], 200);
         } else {
             $request->session()->forget(['master_password_verified', 'master_password_verified_at']);
+
             return response()->json(['master_password' => false], 403);
         }
     }
+
     /**
      * Remove the specified resource from storage.
      */

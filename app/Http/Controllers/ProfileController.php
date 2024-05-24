@@ -178,7 +178,7 @@ class ProfileController extends Controller
 
         // Проверка на существование активных кодов
         if (! $oldEmailVerification || ! $newEmailVerification) {
-            return response()->json(['message' => 'Сессия подтверждения истекла или ещё не инициирована'], 422);
+            return response()->json(['error' => 'Сессия подтверждения истекла или ещё не инициирована'], 422);
         }
 
         // Проверка введенных кодов
@@ -200,7 +200,7 @@ class ProfileController extends Controller
             }
         }
 
-        return response()->json(['message' => 'Проверьте правильность введенных кодов'], 422);
+        return response()->json(['error' => 'Проверьте правильность введенных кодов'], 422);
     }
 
     /* public function update(Request $request)

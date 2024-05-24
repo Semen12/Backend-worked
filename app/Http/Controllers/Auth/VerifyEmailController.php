@@ -15,7 +15,7 @@ class VerifyEmailController extends Controller
     public function __invoke(Request $request): JsonResponse // изменён тип запроса, не из формы (в виде EmailRequest) а через интернет-запрос (Request)
     {
         if ($request->user()->id != $request->id) {
-            return response()->json(['message' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 403);
+            return response()->json(['error' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 403);
         }
 
         // добавлены ответы в виде кодов и собщениями
@@ -29,6 +29,6 @@ class VerifyEmailController extends Controller
             return response()->json(['message' => 'Email успешно подтверждён'], 200);
         }
 
-        return response()->json(['message' => 'Ошибка подтверждения email'], 500);
+        return response()->json(['error' => 'Ошибка подтверждения email'], 500);
     }
 }
