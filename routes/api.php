@@ -102,8 +102,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('user/two-factor/send-confirmation-code', [CustomTwoFactorAuthenticationController::class, 'sendConfirmationCode'])
         ->name('two-factor.send-confirmation-code');
 
-    // Маршрут для отключения двухфакторной аутентификации
-    Route::post('user/two-factor/disable', [CustomTwoFactorAuthenticationController::class, 'destroy'])
+    // Маршрут для отключения двухфакторной аутентификации, переопределён
+
+    Route::delete('user/two-factor-authentication', [CustomTwoFactorAuthenticationController::class, 'destroy'])
         ->name('two-factor.disable');
 
     /*    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
