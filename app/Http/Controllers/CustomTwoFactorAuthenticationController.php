@@ -51,7 +51,7 @@ class CustomTwoFactorAuthenticationController extends Controller
             'two_factor_confirmed_at' => null,
         ])->save();
 
-        TwoFactorAuthenticationDisabled::dispatch($user);
+        TwoFactorAuthenticationDisabled::dispatch($user); //событие отключения 2FA
 
         return response()->json(['message' => 'Двухфакторная аутентификация успешно отключена'], 200);
 

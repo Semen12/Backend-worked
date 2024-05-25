@@ -6,6 +6,7 @@ use App\Enums\AccountType;
 use App\Models\Account;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
 {
@@ -101,6 +102,12 @@ class AccountController extends Controller
      */
     public function show($id) //+
     {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:accounts,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Некорректный запрос'], 422);
+        }
         $userId = request()->user()->id;
         $account = Account::select(['id', 'type', 'name', 'url', 'login', 'password', 'description'])->where('user_id', $userId)->find($id);
         if (! $account) {
@@ -126,6 +133,12 @@ class AccountController extends Controller
      */
     public function update(Request $request, $id) //+
     {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:accounts,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Некорректный запрос'], 422);
+        }
         $validatedData = $request->validate([
             'type' => 'required|string|in:'.implode(',', array_column(AccountType::cases(), 'value')),
             'url' => 'nullable|url|max:100',
@@ -134,6 +147,7 @@ class AccountController extends Controller
             'password' => 'nullable|string|max:255',
             'description' => 'nullable|string',
         ]);
+
 
         $userId = $request->user()->id;
         $account = Account::where('user_id', $userId)->find($id);
@@ -190,6 +204,12 @@ class AccountController extends Controller
      */
     public function destroy($id): JsonResponse //+
     {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:accounts,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Некорректный запрос'], 422);
+        }
 
         $userId = request()->user()->id;
         $account = Account::where('user_id', $userId)->find($id);

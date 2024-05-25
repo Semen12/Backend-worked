@@ -70,12 +70,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::middleware('master.password.check')->group(function () {
 
                 Route::get('/accounts/{id}', [AccountController::class, 'show'])
+                ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
                     ->name('account.show');
 
                 Route::delete('/accounts/destroy/{id}', [AccountController::class, 'destroy'])
+                ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
                     ->name('account.destroy');
 
                 Route::put('/accounts/update/{id}', [AccountController::class, 'update'])
+                ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
                     ->name('account.update');
             });
         });
