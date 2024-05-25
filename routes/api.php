@@ -16,7 +16,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json([
             'user' => $request->user(),
-            // 'two_factor'=>$request->user()->hasEnabledTwoFactorAuthentication(), //метод который проверяет наличие включения 2FA
+             'two_factor'=>$request->user()->hasEnabledTwoFactorAuthentication(), //метод который проверяет наличие включения 2FA
         ]);
     });
 

@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\MasterPasswordToken;
 use App\Notifications\ResetMasterPasswordNotification;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
+use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
+use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
+use PragmaRX\Google2FA\Google2FA;
 
 class MasterPasswordController extends Controller
 {
@@ -40,7 +45,7 @@ class MasterPasswordController extends Controller
 
         $validData = $request->validate([
             'master_password' => ['required', 'confirmed',
-                Password::min(8)
+                Password::min(6)
                     ->mixedCase()
                     ->numbers()
                     ->symbols()
@@ -118,9 +123,14 @@ class MasterPasswordController extends Controller
 
     }
 
+    /**
+     * @throws IncompatibleWithGoogleAuthenticatorException
+     * @throws SecretKeyTooShortException
+     * @throws InvalidCharactersException
+     */
     public function reset(Request $request)
     {
-        if ($request->user()->id != $request->id) {
+        if ($request->user()->id != $request->input('id')) {
             return response()->json(['error' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 403);
         }
         $user = $request->user();
@@ -147,10 +157,43 @@ class MasterPasswordController extends Controller
             return response()->json(['error' => 'Срок действия токена сброса мастер-пароля истек, отправьте письмо для сброса повторно'], 422);
         }
 
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            $request->validate([
+                'auth_code' => 'required', 'string',
+            ]);
+
+            $google2fa = new Google2FA();
+            $valid2fa = $google2fa->verifyKey(decrypt($user->two_factor_secret), $request->input('auth_code'));
+
+            // Проверка кода 2FA
+            if ($valid2fa) {
+                $user->update(['master_password' => $request->master_password]);
+                $resetToken->delete();
+
+                return response()->json(['message' => 'Мастер-пароль успешно восстановлен'], 200);
+            }
+
+            // Проверка кода восстановления
+            $recoveryCodes = explode(',', decrypt($user->two_factor_recovery_codes));
+            if (! in_array($request->input('auth_code'), $recoveryCodes)) {
+                return response()->json(['error' => 'Недействительный код аутентификации или код восстановления'], 422);
+            }
+
+            // Удаление использованного кода восстановления
+            $recoveryCodes = array_diff($recoveryCodes, [$request->input('auth_code')]);
+            $user->two_factor_recovery_codes = encrypt(implode(',', $recoveryCodes));
+            $user->save();
+
+            $user->update(['master_password' => $request->master_password]);
+            $resetToken->delete();
+
+            return response()->json(['message' => 'Мастер-пароль успешно восстановлен'], 200);
+        }
+
         $user->update(['master_password' => $request->master_password]);
         $resetToken->delete();
 
-        return response()->json(['message' => 'Мастер-пароль успешно изменен'], 200);
+        return response()->json(['message' => 'Мастер-пароль успешно восстановлен'], 200);
 
     }
 
