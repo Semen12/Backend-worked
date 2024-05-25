@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'password' => $request->password,
         ]);
 
-        Auth::login($user); // автоматическая утентификация пользователя при регистрации
+        Auth::login($user); // автоматическая аутентификация пользователя при регистрации
         event(new Registered($user)); // событие регистрации пользователя для использования в системе
 
         return response()->json(

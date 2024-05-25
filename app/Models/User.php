@@ -65,4 +65,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(MasterPasswordToken::class); // один к одному
     }
+
+   public function twoFactorDisabledCodes()
+    {
+        return $this->hasOne(TwoFactorConfirmationDisabledCode::class);
+    }
 }

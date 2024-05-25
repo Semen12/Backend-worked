@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CustomTwoFactorAuthenticationController;
 use App\Http\Controllers\MasterPasswordController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json([
             'user' => $request->user(),
-             'two_factor'=>$request->user()->hasEnabledTwoFactorAuthentication(), //метод который проверяет наличие включения 2FA
+            'two_factor' => $request->user()->hasEnabledTwoFactorAuthentication(), //метод который проверяет наличие включения 2FA
         ]);
     });
 
@@ -93,6 +94,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/email-verify', VerifyEmailController::class)
         ->middleware(['signed:relative', 'throttle:60,1'])  // добавлен защитник: подписанный адрес с относительной ссылкой (т.е. без домена)
         ->name('verification.verify');
+
+    // Маршрут для отправки кода подтверждения на почту для отключения 2FA
+    Route::post('user/two-factor/send-confirmation-code', [CustomTwoFactorAuthenticationController::class, 'sendConfirmationCode'])
+        ->name('two-factor.send-confirmation-code');
+
+    // Маршрут для отключения двухфакторной аутентификации
+    Route::post('user/two-factor/disable', [CustomTwoFactorAuthenticationController::class, 'destroy'])
+        ->name('two-factor.disable');
 
     /*    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
                  ->name('logout.sanctum'); */ // выход с помощью fortify */
