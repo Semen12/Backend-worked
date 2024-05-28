@@ -44,9 +44,7 @@ class RegisteredUserController extends Controller
                 'message' => 'Вы успешно зарегистрировались!',
                 'user' => $user,
             ],
-            Response::HTTP_CREATED,
-            $request->filled('errors') ? $request->get('errors') : [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            Response::HTTP_CREATED
         );
     }
 }

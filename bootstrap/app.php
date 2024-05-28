@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\JsonUnicodeMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'master.password.check'=> App\Http\Middleware\CheckMasterPassword::class,
         ]);
 
-        //
+        $middleware->append(JsonUnicodeMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
