@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\MyVerifyEmail;
+use App\Notifications\ResetPasswordLink;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -33,7 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'master_password',
         'remember_token',
-    // добавить для скрытия полей 2FA 'two_factor_recovery_codes',
+        // добавить для скрытия полей 2FA 'two_factor_recovery_codes',
         //    'two_factor_secret',
     ];
 
@@ -51,6 +53,19 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function sendEmailVerificationNotification() //использрвание кастомной нотификации для отправки уведомления для подтверждения почты
+    {
+        $this->notify(new MyVerifyEmail);
+    }
+    /**
+     * Отправить пользователю уведомление о сбросе пароля.
+     *
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void //кастомная нотификация для отправки ссылки восстановления пароля
+    {
+        $this->notify(new ResetPasswordLink($token));
+    }
     public function accounts()
     {
         return $this->hasMany(Account::class); // установление связи один ко многим
@@ -66,7 +81,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(MasterPasswordToken::class); // один к одному
     }
 
-   public function twoFactorDisabledCodes()
+    public function twoFactorDisabledCodes()
     {
         return $this->hasOne(TwoFactorConfirmationDisabledCode::class);
     }

@@ -4,12 +4,13 @@ namespace App\Notifications;
 
 use AllowDynamicProperties;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 
-#[AllowDynamicProperties] class ResetMasterPasswordNotification extends Notification
+#[AllowDynamicProperties] class ResetMasterPasswordNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

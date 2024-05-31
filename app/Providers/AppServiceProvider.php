@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
                 : $rule;
         });
 
-        ResetPassword::toMailUsing(function (object $notifiable, string $token) {
+       /*  ResetPassword::toMailUsing(function (object $notifiable, string $token) {
             $count = config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
             $urlFrontend = config('app.frontend_url')."/password-reset?email={$notifiable->getEmailForPasswordReset()}&token=$token";
 
@@ -48,11 +48,11 @@ class AppServiceProvider extends ServiceProvider
                 ->action('Сбросить пароль', $urlFrontend)
                 ->line("Срок действия этой ссылки для сброса пароля истечет через {$count} минут.")
                 ->line('Если вы не запрашивали сброс пароля, то проигнорируйте это письмо.');
-        });
+        }); */
 
         // подключение и кастомизация подтверждения почты: изменяем адрес для ссылки и текст письма, удаляем адрес по умолчанию, создаем свой
         // также добавляем необходимые параметры для роута verification.verify (id, hash, срок дейсвия, сигнатура)
-        VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+      /*   VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             $urlFrontend = config('app.frontend_url').URL::signedRoute('verification.verify', ['id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification())], now()->addMinutes(60), false);
             $time = 60;
@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
                 ->action('Подтвердить адрес', $urlFrontend)
                 ->line("Данная ссылка  доступна в течение {$time} минут")
                 ->line('Если вы не создавали аккаунт, проигнорируйте данное письмо.');
-        });
+        }); */
 
     }
 }
