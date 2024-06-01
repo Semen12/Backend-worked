@@ -131,7 +131,7 @@ class MasterPasswordController extends Controller
     public function reset(Request $request)
     {
         if ($request->user()->id != $request->input('id')) {
-            return response()->json(['error' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 403);
+            return response()->json(['error' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 422);
         }
         $user = $request->user();
         $request->validate([
@@ -213,7 +213,7 @@ class MasterPasswordController extends Controller
             return response()->json(['message' => 'Мастер-пароль подтверждён'], 200);
         }
 
-        return response()->json(['error' => 'Недействительный мастер-пароль'], 403);
+        return response()->json(['error' => 'Недействительный мастер-пароль'], 422);
     }
 
     public function checkMasterPassword(Request $request)// Проверка, установлен ли мастер-пароль в сессии и его срок действия
