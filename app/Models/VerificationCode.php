@@ -41,7 +41,17 @@ class VerificationCode extends Model
     {
         return 'verification_codes';
     }
+    public static  function customRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; // символы, которые могут быть использованы
+        $charactersLength = strlen($characters);
+        $randomString = '';
 
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        return $randomString;
+    }
     public static function updateExpiredCodesStatus(): void
     {
         self::where('expired_at', '<', now())->where('status', 'pending')->update(['status' => 'invalid']);

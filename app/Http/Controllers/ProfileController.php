@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CodeDestroyUser;
 use App\Models\User;
 use App\Models\VerificationCode;
+use App\Models\VerificationCodeDestroyUser;
 use App\Notifications\NewEmailVerificationCode;
 use App\Notifications\OldEmailVerificationCode;
 use DragonCode\Support\Facades\Helpers\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController extends Controller
@@ -121,8 +125,8 @@ class ProfileController extends Controller
         //  VerificationCode::where('user_id', $user->id)->where('status', 'pending')->update(['status' => 'invalid']);
 
         // Генерация новых кодов
-        $CodeOldEmail = Str::random(7);
-        $CodeNewEmail = Str::random(7);
+        $CodeOldEmail = VerificationCode::customRandomString(7);
+        $CodeNewEmail = VerificationCode::customRandomString(7);
 
         // Проверка наличия существующих кодов и создание новых только при их отсутствии
         $email_old = VerificationCode::updateOrCreate(
@@ -155,8 +159,8 @@ class ProfileController extends Controller
     public function updateEmailVerified(Request $request): JsonResponse
     {
         $validData = $request->validate([
-            'code_oldemail' => ['required', 'string','max:64'],
-            'code_newemail' => ['required', 'string','max:64'],
+            'code_oldemail' => ['required', 'string', 'max:64'],
+            'code_newemail' => ['required', 'string', 'max:64'],
         ]);
 
         $user = $request->user();
@@ -225,14 +229,59 @@ class ProfileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function sendConfirmationCode(Request $request): JsonResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
-        $name = $request->user()->name;
+        $code = VerificationCodeDestroyUser::customRandomString(7); // Генерация кода
+        $expiresAt = Carbon::now()->addMinutes(1); // Время действия кода
+        //добавить в очередь mail письма, создать проверку  на верификацию почты удаление аккаунта пользователя
+        // Сохранение кода в базу данных
+
+        VerificationCodeDestroyUser::updateOrCreate(
+            ['user_id' => $user->id],
+            ['code' => $code, 'expires_at' => $expiresAt]
+        );
+
+        // Отправка кода на почту
+        Mail::to($user->email)->queue(new CodeDestroyUser($code));
+
+        return response()->json(['message' => 'Код подтверждения отправлен на вашу почту'], 200);
+    }
+
+    public function destroy(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+                'confirmation_code' => ['required', 'string', 'max:255'], // предполагаем, что код может быть до 255 символов
+            ]);
+
+            // Получаем код подтверждения из запроса
+            $confirmationCode = $request->input('confirmation_code');
+
+            // Проверяем код
+            $verificationCode = VerificationCodeDestroyUser::where('user_id', $user->id)
+                ->first();
+
+            if ( !$verificationCode && !Hash::check($confirmationCode, $verificationCode->code)) {
+                throw ValidationException::withMessages([
+                    'confirmation_code' => ['Код подтверждения неверен'],
+                ]);
+            }
+            if ($verificationCode->isExpired()) {
+                throw ValidationException::withMessages([
+                    'confirmation_code' => ['Код подтверждения  истек'],
+                ]);
+            }
+        } else {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+            ]);
+        }
+
+        $name = $user->name;
 
         Auth::guard('web')->logout();
 
@@ -241,6 +290,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message`' => "$name, your account has been deleted"], 200);
+        return response()->json(['message`' => "$name, Ваш аккаунт был удален"], 200);
     }
 }

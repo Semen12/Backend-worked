@@ -61,7 +61,7 @@ class CustomTwoFactorAuthenticationController extends Controller
     {
         $user = $request->user();
         $confirmationCode = rand(100000, 999999); // Генерация кода
-        $expiresAt = Carbon::now()->addMinutes(10); // Время действия кода
+        $expiresAt = Carbon::now()->addMinutes(5); // Время действия кода
 
         // Сохранение кода в базу данных
 
@@ -72,8 +72,8 @@ class CustomTwoFactorAuthenticationController extends Controller
 
 
         // Отправка кода на почту
-        Mail::to($user->email)->send(new TwoFactorDisabledCode($confirmationCode));
+        Mail::to($user->email)->queue(new TwoFactorDisabledCode($confirmationCode));
 
-        return response()->json(['message' => 'Код подтверждения отправлен на вашу почту.'], 200);
+        return response()->json(['message' => 'Код подтверждения отправлен на вашу почту'], 200);
     }
 }

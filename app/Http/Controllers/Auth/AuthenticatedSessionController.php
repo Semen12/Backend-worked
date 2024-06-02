@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 //use Illuminate\Http\Client\Response;
+use App\Mail\CodeDestroyUser;
+use App\Models\VerificationCodeDestroyUser;
+use DragonCode\Support\Helpers\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 //use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticatedSessionController extends Controller
@@ -39,6 +44,8 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
+
+
     public function destroy(Request $request): JsonResponse
     {
         Auth::guard('web')->logout(); /* Эта строка отвечает за выход пользователя из системы. Она использует метод logout() для аутентификационного экземпляра по умолчанию web.
@@ -51,7 +58,7 @@ class AuthenticatedSessionController extends Controller
 
         return response()->json(
             [
-                'message' => 'Вы вышли из системы',
+                'message' => 'Вы вышли из системы.',
             ],
             Response::HTTP_OK,
             [],

@@ -15,9 +15,19 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user', function (Request $request) {
+        $user = $request->user();
+        
         return response()->json([
-            'user' => $request->user(),
-            'two_factor' => $request->user()->hasEnabledTwoFactorAuthentication(), //метод который проверяет наличие включения 2FA
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified' => $user->email_verified_at ? true : false,
+                // добавьте проверку наличия мастер-пароля, если это релевантно
+                'master_password' => $user->master_password ? true : false,
+                'two_factor' => $user->hasEnabledTwoFactorAuthentication(),
+            ],
+            
         ]);
     });
 
@@ -86,6 +96,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::patch('/user/password-update', [PasswordController::class, 'update'])
         ->name('password.update');
+
+    Route::post('/user/send-delete-code', [ProfileController::class, 'sendConfirmationCode'])
+        ->middleware('verified')
+        ->name('profile.send.delete.code');
 
     Route::delete('/user/destroy', [ProfileController::class, 'destroy'])
         ->name('profile.delete');
