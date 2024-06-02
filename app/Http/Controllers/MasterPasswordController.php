@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\MasterPasswordToken;
 use App\Notifications\ResetMasterPasswordNotification;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -147,7 +146,10 @@ class MasterPasswordController extends Controller
         ]);
 
         $resetToken = MasterPasswordToken::where('user_id', $user->id)->first();
-        if (! $resetToken || ! Hash::check($request->token, $resetToken->token)) {
+        if (is_null($resetToken)) {
+            return response()->json(['error' => 'Токен для сброса мастер-пароля не найден'], 422);
+        }
+        if (! Hash::check($request->token, $resetToken->token)) {
             return response()->json(['error' => 'Недействительный токен для сброса мастер-пароля'], 422);
         }
         if (Carbon::now()->gt($resetToken->expired_at)) {

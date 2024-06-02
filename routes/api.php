@@ -39,8 +39,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::middleware('verified')->group(function () {
 
-        Route::post('/user/update-email-sent', [ProfileController::class, 'sendCodeEmails'])
-            ->name('profile.sentсode.emails');
+        Route::post('/user/update-email-send', [ProfileController::class, 'sendCodeEmails'])
+            ->name('profile.send.сode.emails');
 
         Route::patch('/user/update-email-verified', [ProfileController::class, 'updateEmailVerified'])
             ->name('profile.email.verified');
@@ -114,6 +114,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Маршрут для отправки кода подтверждения на почту для отключения 2FA
     Route::post('user/two-factor/send-confirmation-code', [CustomTwoFactorAuthenticationController::class, 'sendConfirmationCode'])
+        ->middleware('verified')
         ->name('two-factor.send-confirmation-code');
 
     // Маршрут для отключения двухфакторной аутентификации, переопределён

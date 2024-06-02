@@ -264,8 +264,11 @@ class ProfileController extends Controller
             // Проверяем код
             $verificationCode = VerificationCodeDestroyUser::where('user_id', $user->id)
                 ->first();
+            if (is_null($verificationCode)) {
+                return response()->json(['error' => 'Код подтверждения не найден'], 422);
+            }
 
-            if ( !$verificationCode && !Hash::check($confirmationCode, $verificationCode->code)) {
+            if ( !Hash::check($confirmationCode, $verificationCode->code)) {
                 throw ValidationException::withMessages([
                     'confirmation_code' => ['Код подтверждения неверен'],
                 ]);
