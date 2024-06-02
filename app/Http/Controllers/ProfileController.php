@@ -75,7 +75,7 @@ class ProfileController extends Controller
 
             return response()->json(['message' => 'Email пользователя успешно обновлен', 'user' => $user], 200);
         } else {
-            return response()->json(['message' => 'Email пользователя уже подтвержден. Изменение почты данным способом невозможно.', 'user' => $user], 200);
+            return response()->json(['message' => 'Email пользователя уже подтвержден. Изменение почты данным способом невозможно', 'user' => $user], 200);
         }
     }
 
@@ -200,7 +200,7 @@ class ProfileController extends Controller
 
             // Пометить email пользователя как подтвержденный
             if ($request->user()->markEmailAsVerified()) {
-                return response()->json(['message' => 'Почта успешно обновлена.', $oldEmailVerification], 200);
+                return response()->json(['message' => 'Почта успешно обновлена', $oldEmailVerification], 200);
             }
         }
 
