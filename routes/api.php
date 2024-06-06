@@ -1,6 +1,7 @@
 <?php
 
 /*@formatter:on*/
+
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -16,7 +17,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user', function (Request $request) {
         $user = $request->user();
-        
+
         return response()->json([
             'user' => [
                 'id' => $user->id,
@@ -27,7 +28,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 'master_password' => $user->master_password ? true : false,
                 'two_factor' => $user->hasEnabledTwoFactorAuthentication(),
             ],
-            
+
         ]);
     });
 
@@ -80,19 +81,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::middleware('master.password.check')->group(function () {
 
                 Route::get('/accounts/{id}', [AccountController::class, 'show'])
-                ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
+                    ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
                     ->name('account.show');
 
                 Route::delete('/accounts/destroy/{id}', [AccountController::class, 'destroy'])
-                ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
+                    ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
                     ->name('account.destroy');
 
                 Route::put('/accounts/update/{id}', [AccountController::class, 'update'])
-                ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
+                    ->whereNumber('id') // Ограничение параметра id, чтобы он содержал только цифры
                     ->name('account.update');
             });
         });
-
     });
     Route::patch('/user/password-update', [PasswordController::class, 'update'])
         ->name('password.update');
@@ -112,15 +112,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware(['signed:relative', 'throttle:60,1'])  // добавлен защитник: подписанный адрес с относительной ссылкой (т.е. без домена)
         ->name('verification.verify');
 
-    // Маршрут для отправки кода подтверждения на почту для отключения 2FA
-    Route::post('user/two-factor/send-confirmation-code', [CustomTwoFactorAuthenticationController::class, 'sendConfirmationCode'])
-        ->middleware('verified')
-        ->name('two-factor.send-confirmation-code');
+    Route::group(['middleware' => 'verified'], function () {
+       
+        Route::post('/user/two-factor/send-enable-code', [CustomTwoFactorAuthenticationController::class, 'sendVerificationEnabledCode'])
+            ->name('two-factor.send-enable-code');
 
-    // Маршрут для отключения двухфакторной аутентификации, переопределён
+        // Маршрут для включения двухфакторной аутентификации, переопределён
+        Route::post('/user/two-factor-authentication', [CustomTwoFactorAuthenticationController::class, 'store'])
+            ->name('two-factor.store');
 
-    Route::delete('user/two-factor-authentication', [CustomTwoFactorAuthenticationController::class, 'destroy'])
-        ->name('two-factor.disable');
+        // Маршрут для отправки кода подтверждения на почту для отключения 2FA
+        Route::post('user/two-factor/send-confirmation-code', [CustomTwoFactorAuthenticationController::class, 'sendConfirmationCode'])
+            ->name('two-factor.send-confirmation-code');
+
+        // Маршрут для отключения двухфакторной аутентификации, переопределён
+
+        Route::delete('user/two-factor-authentication', [CustomTwoFactorAuthenticationController::class, 'destroy']) // немного переделать логику
+            ->name('two-factor.disable');
+    });
+
 
     /*    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
                  ->name('logout.sanctum'); */ // выход с помощью fortify */

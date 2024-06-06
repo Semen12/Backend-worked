@@ -233,7 +233,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $code = VerificationCodeDestroyUser::customRandomString(7); // Генерация кода
-        $expiresAt = Carbon::now()->addMinutes(1); // Время действия кода
+        $expiresAt = Carbon::now()->addMinutes(5); // Время действия кода
         //добавить в очередь mail письма, создать проверку  на верификацию почты удаление аккаунта пользователя
         // Сохранение кода в базу данных
 
@@ -293,6 +293,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message`' => "$name, Ваш аккаунт был удален"], 200);
+        return response()->json(['message' => "$name, Ваш аккаунт был удален"], 200);
     }
 }

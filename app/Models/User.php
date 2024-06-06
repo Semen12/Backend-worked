@@ -86,6 +86,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(TwoFactorConfirmationDisabledCode::class);
     }
 
+    public function TwoFactorEnableCode()
+    {
+        return $this->hasOne(TwoFactorEnableCode::class);
+    }
+
     public function  CodeDestroyUserAccount()
     {
         return $this->hasOne(VerificationCodeDestroyUser::class);

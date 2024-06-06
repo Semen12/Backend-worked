@@ -11,7 +11,7 @@
         "laravel/fortify": "^1.21",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9",
+        "laravel/tinker": "^2.9" ,
         "php-http/httplug": "^2.4"
     },
     "require-dev": {
