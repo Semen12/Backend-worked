@@ -21,7 +21,7 @@ class CheckMasterPassword
         if (! $request->session()->has('master_password_verified') ||
             ! $request->session()->get('master_password_verified') ||
             ! $masterPasswordVerifiedAt ||
-            Carbon::parse($masterPasswordVerifiedAt)->addMinutes(2)->isPast()) {
+            Carbon::parse($masterPasswordVerifiedAt)->addMinutes(30)->isPast()) {
 
             $request->session()->forget(['master_password_verified', 'master_password_verified_at']);
 

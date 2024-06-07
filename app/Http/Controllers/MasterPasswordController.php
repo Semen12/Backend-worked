@@ -203,7 +203,7 @@ class MasterPasswordController extends Controller
     // позволяет использовать механизмы сессии для установки статуса мастер пароля
     {
         $request->validate([
-            'master_password' => 'required|string|min:6|max:255',
+            'master_password' => 'required|string|max:255',
         ]);
 
         $user = $request->user();
@@ -223,7 +223,7 @@ class MasterPasswordController extends Controller
         $isVerified = $request->session()->get('master_password_verified', false);
         $masterPasswordVerifiedAt = $request->session()->get('master_password_verified_at');
 
-        if ($isVerified && $masterPasswordVerifiedAt && Carbon::parse($masterPasswordVerifiedAt)->addMinutes(2)->isFuture()) {
+        if ($isVerified && $masterPasswordVerifiedAt && Carbon::parse($masterPasswordVerifiedAt)->addMinutes(30)->isFuture()) {
             return response()->json(['master_password' => true], 200);
         } else {
             $request->session()->forget(['master_password_verified', 'master_password_verified_at']);

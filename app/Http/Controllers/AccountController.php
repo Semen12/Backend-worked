@@ -17,7 +17,7 @@ class AccountController extends Controller
     {
         $userId = request()->user()->id;
         $accounts = Account::where('user_id', $userId)
-            ->select(['id', 'name', 'login', 'url']) // выбираем только нужные поля
+            ->select(['id', 'name', 'login', 'type']) // выбираем только нужные поля
             ->get(); // метод, который выполняет запрос к базе данных
 
         return response()->json(['data' => $accounts], 200);
@@ -42,14 +42,34 @@ class AccountController extends Controller
      */
     public function store(Request $request): JsonResponse //+
     {
-        $validatedData = $request->validate([
-            'type' => 'required|string|in:'.implode(',', array_column(AccountType::cases(), 'value')), //подключение списка
-            'url' => 'nullable|url|max:100',
-            'name' => 'required|string|max:100',
-            'login' => 'required|string|max:100',
-            'password' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+         // Приведение всех значений AccountType к строковому типу для использования в валидации
+         $accountTypeValues = implode(',', array_column(AccountType::cases(), 'value'));
+
+         // Создание валидационного объекта
+         $validator = Validator::make($request->all(), [
+             'type' => 'required|string|in:' . $accountTypeValues,
+             'name' => 'required|string|max:100',
+             'login' => 'required|string|max:100',
+             'password' => 'nullable|string|max:255',
+             'description' => 'nullable|string',
+         ]);
+ 
+         // Условное валидационное правило для url
+         $validator->sometimes('url', 'nullable|url|max:100', function ($input) {
+             return $input->type !== 'другое';
+         });
+ 
+         // Условное валидационное правило для url как строка
+         $validator->sometimes('url', 'nullable|string|max:100', function ($input) {
+             return $input->type === 'другое';
+         });
+ 
+         // Выполнение валидации
+         if ($validator->fails()) {
+             return response()->json(['errors' => $validator->errors()], 422);
+         }
+ 
+         $validatedData = $validator->validated();
 
         $userId = $request->user()->id;
         $type = $validatedData['type'];
