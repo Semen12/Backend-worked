@@ -50,20 +50,22 @@ class CustomTwoFactorAuthenticationController extends Controller
         $request->validate([
             'password' => ['required', 'current_password'],
             'code' => ['required', 'max:255'],
-
         ]);
         $user = $request->user();
         
         // Проверка, включена ли у пользователя 2FA
         if ($user->hasEnabledTwoFactorAuthentication()) {
-            return response()->json(['error' => 'Двухфакторная аутентификация уже включена'], 422);
+            return response()->json(['error' => 
+            'Двухфакторная аутентификация уже включена'], 422);
         }
 
         // Получение кода из базы данных
-        $twoFactorCode = TwoFactorEnableCode::where('user_id', $user->id)->first();
+        $twoFactorCode = TwoFactorEnableCode::where('user_id', 
+        $user->id)->first();
 
         if (is_null($twoFactorCode)) {
-            return response()->json(['error' => 'Код не найден'], 422);
+            return response()->json(['error' => 
+            'Код не найден'], 422);
         }
 
         if ($twoFactorCode->isExpired()) {         
@@ -72,13 +74,10 @@ class CustomTwoFactorAuthenticationController extends Controller
         if (!Hash::check($request->code, $twoFactorCode->code)) {
             return response()->json(['error' => 'Недействительный код'], 422);
         }
-
         // Включение двухфакторной аутентификации через метод клаасса
         $enable($user, $request->boolean('force', false));
-
         // Удаление кода из базы данных
         $twoFactorCode->delete();
-
         return response()->json(['message' => 'Первый этап подключения успешно пройден.'], 200);
     }
 

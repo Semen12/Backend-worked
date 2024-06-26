@@ -14,7 +14,7 @@ return new class extends Migration
 
         Schema::create('verification_codes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('type_email');
             // $table->string('model_type');
             $table->string('verification_value');

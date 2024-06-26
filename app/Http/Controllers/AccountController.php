@@ -6,6 +6,7 @@ use App\Enums\AccountType;
 use App\Models\Account;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
@@ -79,29 +80,39 @@ class AccountController extends Controller
 
         // Проверка дублирования учетной записи по name и login
         $existingAccountByNameAndLogin = Account::where('user_id', $userId)
-            ->whereRaw('LOWER(name) = ?', [$nameLowerCase])
-            ->where('login', $login)  // Проверка логина без приведения к нижнему регистру. буду использовать такой принцип для логина
-            ->first();
+        ->get()
+        ->first(function($record) use ($nameLowerCase, $login) {
+            $decryptedName = $record->name;
+            $decryptedLogin = $record->login;
+            
+            return strtolower($decryptedName) === strtolower($nameLowerCase) && $decryptedLogin === $login;
+        });
 
         if ($existingAccountByNameAndLogin) {
-            return response()->json(['error' => 'Учетная запись с такими названием и логином уже существует'], 422);
+            return response()->json(['error' => 
+            'Учетная запись с такими названием и логином уже существует'], 422);
         }
 
-        // Проверка дублирования учетной записи по login и url, если URL указан
+        // Проверка дублирования учетной записи по login и url, 
+        // если URL указан, то возращает ошибку
         if ($url) {
             $existingAccountByLoginAndUrl = Account::where('user_id', $userId)
-                ->where('login', $login)  // Проверка логина без приведения к нижнему регистру
-                ->whereRaw('LOWER(url) = ?', [$url])
-                ->first();
-
+            ->get()
+            ->first(function($record) use ($login, $url) {
+                $decryptedLogin = $record->login;
+                $decryptedUrl = $record->url;
+                
+                return $decryptedLogin === $login && strtolower($decryptedUrl) === strtolower($url);
+            });
             if ($existingAccountByLoginAndUrl) {
                 return response()->json(['error' => 'Учетная запись с таким логином и url-адресом уже существует'], 422);
             }
         }
-
+    
         // Проверка корректности URL для интернет-ресурсов
         if ($type === AccountType::INTERNET_RESOURCE->value && ! $url) {
-            return response()->json(['error' => 'URL обязателен для выбранного типа учетной записи'], 422);
+            return response()->json(['error' => 
+            'URL обязателен для выбранного типа учетной записи'], 422);
         }
 
         $account = Account::create([
@@ -129,14 +140,14 @@ class AccountController extends Controller
             return response()->json(['error' => 'Некорректный запрос'], 422);
         }
         $userId = request()->user()->id;
-        $account = Account::select(['id', 'type', 'name', 'url', 'login', 'password', 'description'])->where('user_id', $userId)->find($id);
+        $account = Account::select(['id', 'type', 'name', 'url', 'login', 
+        'password', 'description'])->where('user_id', $userId)->find($id);
         if (! $account) {
             return response()->json(['error' => 'Учетная запись не найдена'], 404);
         }
         // Отключаем скрытие атрибута "password"
         $account->makeVisible('password');
-        // ($account->password == null) ? $account->password = 'false' : $account->password = 'true'; вот так можно реализовать для фронта
-
+       
         return response()->json(['data' => $account], 200);
     }
 
@@ -181,11 +192,15 @@ class AccountController extends Controller
         $login = $validatedData['login'];
 
         // Проверка дублирования учетной записи по name и login
-        $existingAccountByNameAndLogin = Account::where('user_id', $userId)
-            ->whereRaw('LOWER(name) = ?', [$nameLowerCase])
-            ->where('login', $login)
-            ->where('id', '!=', $account->id)
-            ->first();
+    $existingAccountByNameAndLogin = Account::where('user_id', $userId)
+    ->get()
+    ->first(function($record) use ($nameLowerCase, $login, $account) {
+        $decryptedName = $record->name;
+        $decryptedLogin = $record->login;
+
+        return strtolower($decryptedName) === strtolower($nameLowerCase) && $decryptedLogin === $login && $record->id !== $account->id;
+    });
+
 
         if ($existingAccountByNameAndLogin) {
             return response()->json(['error' => 'Учетная запись с такими названием и логином уже существует'], 422);
@@ -197,10 +212,13 @@ class AccountController extends Controller
         // Проверка дублирования учетной записи по login и url, если URL указан
         if ($url) {
             $existingAccountByLoginAndUrl = Account::where('user_id', $userId)
-                ->where('login', $login)
-                ->whereRaw('LOWER(url) = ?', [$url])
-                ->where('id', '!=', $account->id)
-                ->first();
+            ->get()
+            ->first(function($record) use ($login, $url, $account) {
+                $decryptedLogin = $record->login;
+                $decryptedUrl = $record->url;
+
+                return $decryptedLogin === $login && strtolower($decryptedUrl) === strtolower($url) && $record->id !== $account->id;
+            });
 
             if ($existingAccountByLoginAndUrl) {
                 return response()->json(['error' => 'Учетная запись с таким логином и url-адресом уже существует'], 422);

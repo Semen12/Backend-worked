@@ -24,7 +24,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 'name' => $user->name,
                 'email' => $user->email,
                 'email_verified' => $user->email_verified_at ? true : false,
-                // добавьте проверку наличия мастер-пароля, если это релевантно
                 'master_password' => $user->master_password ? true : false,
                 'two_factor' => $user->hasEnabledTwoFactorAuthentication(),
             ],

@@ -15,7 +15,7 @@ Route::middleware(['guest'])->group(function () {
                ->name('login.sanctum'); */ // используется вход fortify
 
     Route::post('password-forgot', [PasswordResetLinkController::class, 'store'])
-        ->middleware('throttle:60,1') // 60 раз в минуту
+        ->middleware('throttle:6,1') 
         ->name('password.email');
 
     Route::post('password-reset', [NewPasswordController::class, 'store'])

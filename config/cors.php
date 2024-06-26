@@ -17,7 +17,7 @@ return [
 
     'paths' => ['*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST','PUT','PATCH','DELETE'],
 
     'allowed_origins' => [env('FRONTEND_URL', 'http://192.168.43.3:8080')],
 

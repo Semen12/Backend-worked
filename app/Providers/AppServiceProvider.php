@@ -30,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+          URL::forceScheme('https');
+        
         Password::defaults(function () {
             $rule = Password::min(8);
 

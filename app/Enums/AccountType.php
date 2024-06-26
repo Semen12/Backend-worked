@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Enums;
+use Illuminate\Validation\Rules\Enum;
 
-enum AccountType: string
+
+enum AccountType: string 
 {
     case INTERNET_RESOURCE = 'интернет-ресурс';
     case PROGRAM = 'программа';
@@ -16,4 +18,9 @@ enum AccountType: string
     case VPN = 'VPN';
     case PAYMENT_SYSTEMS = 'платежные системы';
     case OTHER = 'другое';
+    
+     public static function isValid($value)
+    {
+        return in_array($value, array_column(self::cases(), 'value'));;
+    }
 }

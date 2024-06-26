@@ -42,20 +42,20 @@ class MasterPasswordController extends Controller
             return response()->json(['error' => 'Мастер-пароль уже установлен'], 422);
         }
 
-        $validData = $request->validate([
-            'master_password' => ['required', 'confirmed',
-                Password::min(6)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised(), 'max:255',
-                function ($attribute, $value, $fail) use ($request) {
-                    // Пользовательское  правило для проверки отличия от текущего пароля и мастер-пароля
-                    if (Hash::check($value, $request->user()->password)) {
-                        $fail('Мастер-пароль должен отличаться от пароля учетной записи');
-                    }
-                },
-            ],
+    $validData = $request->validate([
+        'master_password' => ['required', 'confirmed',
+            Password::min(6)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised(), 'max:255',
+            function ($attribute, $value, $fail) use ($request) {
+        // Пользовательское  правило для проверки отличия от текущего пароля и мастер-пароля
+                if (Hash::check($value, $request->user()->password)) {
+                    $fail('Мастер-пароль должен отличаться от пароля учетной записи');
+                }
+            },
+        ],
 
         ]);
         $user->master_password = $validData['master_password'];
@@ -73,7 +73,8 @@ class MasterPasswordController extends Controller
         //
         $user = $request->user();
         $validData = $request->validate([
-            'master_password' => ['required', 'min:6', 'max:255', function ($attribute, $value, $fail) use ($request) {
+            'master_password' => ['required', 'min:6', 'max:255', 
+            function ($attribute, $value, $fail) use ($request) {
                 if (! Hash::check($value, $request->user()->master_password)) {
                     $fail('Текущий мастер-пароль не верен');
                 }
@@ -90,13 +91,13 @@ class MasterPasswordController extends Controller
                     }
                 }],
         ], [
-            'new_master_password.different' => 'Новый мастер-пароль должен отличаться от текущего мастер-пароля',
+            'new_master_password.different' => 
+            'Новый мастер-пароль должен отличаться от текущего мастер-пароля',
         ]);
 
         $user->update(['master_password' => $validData['new_master_password']]);
 
         return response()->json(['message' => 'Мастер-пароль обновлен'], 200);
-
     }
 
     //отправляем ссылку для восстановления пароля на почту
@@ -130,7 +131,8 @@ class MasterPasswordController extends Controller
     public function reset(Request $request)
     {
         if ($request->user()->id != $request->input('id')) {
-            return response()->json(['error' => 'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 422);
+            return response()->json(['error' => 
+            'Ссылка для данного пользователя недействительна. Отправьте письмо повторно.'], 422);
         }
         $user = $request->user();
         $request->validate([
@@ -156,7 +158,8 @@ class MasterPasswordController extends Controller
             $resetToken->delete();
 
             // Срок действия токена истек
-            return response()->json(['error' => 'Срок действия токена сброса мастер-пароля истек, отправьте письмо для сброса повторно'], 422);
+            return response()->json(['error' => 
+            'Срок действия токена сброса мастер-пароля истек, отправьте письмо для сброса повторно'], 422);
         }
 
         if ($user->hasEnabledTwoFactorAuthentication()) {

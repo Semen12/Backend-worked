@@ -25,7 +25,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'master_password',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -35,10 +34,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'master_password',
         'remember_token',
-        // добавить для скрытия полей 2FA 'two_factor_recovery_codes',
-        //    'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+        'two_factor_confirmed_at'
     ];
-
     /**
      * Get the attributes that should be cast.
      *

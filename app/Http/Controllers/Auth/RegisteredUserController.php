@@ -23,22 +23,19 @@ class RegisteredUserController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'], // обязательно для заполнения
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            // почта обязательна для заполнения, маленькие буквы строка, максимальная длина 255, уникальная
+            'name' => ['required', 'string', 'max:255'], 
+            'email' => ['required', 'string', 'lowercase', 'email',
+             'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            //пароль обязателен для заполнения, повторить пароль обязателен для заполнения
+           
         ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
         ]);
-
-        Auth::login($user); // автоматическая аутентификация пользователя при регистрации
-        event(new Registered($user)); // событие регистрации пользователя для использования в системе
-
+        Auth::login($user); 
+        event(new Registered($user)); 
         return response()->json(
             [
                 'message' => 'Вы успешно зарегистрировались!',

@@ -37,7 +37,8 @@ class MyVerifyEmail extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
        
-            $urlFrontend = config('app.frontend_url').URL::signedRoute('verification.verify', ['id' => $notifiable->getKey(),
+            $urlFrontend = config('app.frontend_url').URL::signedRoute('verification.verify', 
+                ['id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification())], now()->addMinutes(60), false);
             $time = 60;
 

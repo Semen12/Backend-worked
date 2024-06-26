@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('two_factor_enable_codes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('code');
             $table->timestamp('expires_at');
             $table->timestamps();
